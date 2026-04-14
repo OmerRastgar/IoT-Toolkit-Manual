@@ -37,7 +37,7 @@ Choose your preferred cloud deployment method:
 
 <div class="grid cards" markdown>
 
--   :material-cloud-aws: **AWS IoT Core**
+-   :material-cloud: **AWS IoT Core**
 
     ---
 
@@ -45,7 +45,7 @@ Choose your preferred cloud deployment method:
 
     [Learn more](cloud/aws.md)
 
--   :material-server: **Self-Hosted**
+-   :material-server: **Self-Hosted Server**
 
     ---
 

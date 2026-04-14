@@ -8,7 +8,7 @@ Two deployment methods are supported:
 
 <div class="grid cards" markdown>
 
--   :material-cloud-aws: **AWS IoT Core**
+-   :material-cloud: **AWS IoT Core**
 
     ---
 

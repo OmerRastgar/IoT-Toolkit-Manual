@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: iot-mosquitto
+    restart: always
+    ports:
+      - "1883:1883"   # MQTT Port (Non-TLS)
+      - "8883:8883"   # MQTT Port (Secure TLS)
+      - "9001:9001"   # MQTT over WebSockets
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/certs:/mosquitto/certs
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: iot-nodered
+    restart: always
+    ports:
+      - "1880:1880"   # Node-RED UI + HTTP API
+      - "5683:5683/udp" # CoAP Port
+    volumes:
+      - ./node-red/data:/data
+    depends_on:
+      - mosquitto
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: iot-influxdb
+    restart: always
+    ports:
+      - "8086:8086"   # InfluxDB UI/API
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb2
+      - ./influxdb/config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=iotpassword123
+      - DOCKER_INFLUXDB_INIT_ORG=iot-toolkit
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensor_data
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w

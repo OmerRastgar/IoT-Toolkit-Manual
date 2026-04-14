@@ -154,9 +154,7 @@ This documentation is provided for educational purposes.
 
 ## Acknowledgments
 
-- ESP32 community for excellent documentation
-- Arduino team for the platform
-- Contributors to open-source libraries used in this project
+Research done by Basil Khowaja and Vishal Raj for Dr Tariq Mumtaz Summer project.
 
 ## Support
 

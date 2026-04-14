@@ -147,50 +147,41 @@ Use a cloud provider (AWS, GCP, Azure, DigitalOcean) for always-online server.
 2. SSH into server
 3. Follow Raspberry Pi steps above
 
-### Docker Deployment (Recommended)
+### Option C: Pre-Configured Docker Stack (Recommended)
 
-```yaml
-# docker-compose.yml
-version: '3.8'
+For a fast and robust setup, we have provided a pre-configured Docker environment in the repo. This includes a synchronized MQTT Broker, Node-RED engine, and InfluxDB database.
 
-services:
-  mosquitto:
-    image: eclipse-mosquitto:2
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+### 📁 Stack Location
+Everything you need is located in the root of this repository:
+[**onprem-docker/**](../../onprem-docker/)
 
-  influxdb:
-    image: influxdb:2
-    ports:
-      - "8086:8086"
-    volumes:
-      - ./influxdb/data:/var/lib/influxdb2
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=adminpassword
-      - DOCKER_INFLUXDB_INIT_ORG=iot-toolkit
-      - DOCKER_INFLUXDB_INIT_BUCKET=sensor-data
+### 📊 Supported Communication Methods
+This stack is designed to handle multiple IoT protocols simultaneously, making it ideal for testing different ESP32 configurations:
 
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./grafana/data:/var/lib/grafana
-    depends_on:
-      - influxdb
-```
+| Method | Protocol | Port | Description |
+| :--- | :--- | :--- | :--- |
+| **MQTT (Local)** | MQTT | `1883` | Standard, non-encrypted communication for local labs. |
+| **MQTT (Secure)** | MQTT/SSL | `8883` | Encrypted communication for VPS/Cloud deployments. |
+| **HTTP REST** | HTTP | `1880` | Use Node-RED as a web server to receive POST data. |
+| **CoAP** | CoAP/UDP | `5683` | Low-power, UDP-based transfers for constrained devices. |
 
-Run:
-```bash
-docker-compose up -d
-```
+### 🚀 Launch Instructions
+
+1.  Navigate to the `onprem-docker/` folder.
+2.  Start the services:
+    ```bash
+    docker-compose up -d
+    ```
+3.  Access the dashboards:
+    - **Node-RED**: [http://localhost:1880](http://localhost:1880) (Central Logic Hub)
+    - **InfluxDB**: [http://localhost:8086](http://localhost:8086) (Time-Series Data)
+
+### 🔐 Security for VPS
+If you are deploying this on a VPS, use the provided certificate generator:
+1.  Run `.\generate_certs.ps1` (Windows) inside the `onprem-docker` folder.
+2.  Enable the secure listener in `mosquitto/config/mosquitto.conf`.
+
+---
 
 ## Configure ESP32
 
