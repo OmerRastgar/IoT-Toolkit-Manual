@@ -1,0 +1,173 @@
+site_name: IoT Toolkit Manual
+site_description: A student-friendly guide for setting up ESP32-based IoT hardware with sensors, displays, and cloud connectivity
+site_author: IoT Toolkit Team
+site_url: https://omerRastgar.github.io/IoT-Toolkit-Manual
+
+docs_dir: docs
+site_dir: site
+
+repo_name: IoT-Toolkit-Manual
+repo_url: https://github.com/OmerRastgar/IoT-Toolkit-Manual
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2024 IoT Toolkit Team
+
+theme:
+  name: material
+  language: en
+  custom_dir: docs/overrides
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  favicon: assets/images/favicon.png
+  logo: assets/images/logo.png
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/OmerRastgar/IoT-Toolkit-Manual
+  version:
+    provider: mike
+
+plugins:
+  - search
+  - awesome-pages
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+
+markdown_extensions:
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: OmerRastgar
+      repo: IoT-Toolkit-Manual
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - getting-started/prerequisites.md
+    - getting-started/hardware-list.md
+    - getting-started/assembly-guide.md
+  - Hardware:
+    - hardware/index.md
+    - hardware/esp32.md
+    - Sensors:
+      - hardware/sensors/index.md
+      - hardware/sensors/temperature.md
+      - hardware/sensors/humidity.md
+      - hardware/sensors/vibration.md
+      - hardware/sensors/acoustic.md
+    - Displays:
+      - hardware/displays/index.md
+      - hardware/displays/lcd.md
+      - hardware/displays/tft.md
+    - Modules:
+      - hardware/modules/index.md
+      - hardware/modules/i2c-multiplexer.md
+      - hardware/modules/voice.md
+      - hardware/modules/camera.md
+    - Communication:
+      - hardware/communication/index.md
+      - hardware/communication/mqtt.md
+      - hardware/communication/http.md
+      - hardware/communication/coap.md
+    - hardware/wiring-diagrams.md
+  - Software:
+    - software/index.md
+    - software/firmware-setup.md
+    - software/libraries.md
+    - software/code-examples.md
+  - Integration:
+    - integration/index.md
+    - integration/complete-code.md
+    - integration/testing.md
+  - Cloud:
+    - cloud/index.md
+    - cloud/aws.md
+    - cloud/self-hosted.md
+  - Troubleshooting:
+    - troubleshooting/index.md
+    - troubleshooting/hardware-issues.md
+    - troubleshooting/software-issues.md
+  - Resources:
+    - resources/index.md
+    - resources/glossary.md
+    - resources/references.md

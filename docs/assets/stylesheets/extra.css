@@ -1,0 +1,51 @@
+/* Custom styles for IoT Toolkit Manual */
+
+/* Make code blocks more readable */
+.md-typeset pre {
+    border-radius: 0.3rem;
+}
+
+/* Highlight important notes */
+.md-typeset .admonition {
+    border-radius: 0.3rem;
+}
+
+/* Better spacing for tables */
+.md-typeset table {
+    border-radius: 0.3rem;
+    overflow: hidden;
+}
+
+/* Custom styles for hardware component cards */
+.hardware-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.hardware-card {
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: box-shadow 0.2s;
+}
+
+.hardware-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Pinout table styling */
+.pinout-table th {
+    background-color: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
+}
+
+/* Code copy button enhancement */
+.highlight .md-clipboard {
+    opacity: 0.7;
+}
+
+.highlight:hover .md-clipboard {
+    opacity: 1;
+}
