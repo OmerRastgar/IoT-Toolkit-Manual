@@ -15,7 +15,6 @@ copyright: Copyright &copy; 2024 IoT Toolkit Team
 theme:
   name: material
   language: en
-  custom_dir: docs/overrides
   features:
     - navigation.tabs
     - navigation.sections
@@ -159,7 +158,7 @@ nav:
     - integration/index.md
     - integration/complete-code.md
     - integration/testing.md
-  - Cloud:
+  - Cloud & Deployment:
     - cloud/index.md
     - cloud/aws.md
     - cloud/self-hosted.md
