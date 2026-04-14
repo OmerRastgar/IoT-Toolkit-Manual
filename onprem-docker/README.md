@@ -243,6 +243,9 @@ void loop() {
 ---
 
 ## 🏗️ Data Integration Hub
+
+![System Architecture](../docs/assets/images/toolkit/architecture.png)
+
 Node-RED serves as the central brain of this stack. It receives data from different protocols and normalizes them before sending them to InfluxDB.
 
 1.  **Input Nodes**: Create `mqtt in`, `http in`, and `coap in` nodes.

@@ -147,7 +147,15 @@ Use a cloud provider (AWS, GCP, Azure, DigitalOcean) for always-online server.
 2. SSH into server
 3. Follow Raspberry Pi steps above
 
-### Option C: Pre-Configured Docker Stack (Recommended)
+### Option C: System Topology
+
+The on-premise stack follows a centralized "Data Integration Hub" pattern, where Node-RED serves as the primary normalization layer for all incoming IoT data.
+
+![System Architecture](../assets/images/toolkit/architecture.png)
+
+This architecture allows you to test multiple protocols (MQTT, HTTP, CoAP) simultaneously and route them all into a single InfluxDB temporal database.
+
+### Pre-Configured Infrastructure
 
 For a fast and robust setup, we have provided a pre-configured Docker environment in the repo. This includes a synchronized MQTT Broker, Node-RED engine, and InfluxDB database.
 

@@ -1,0 +1,365 @@
+﻿
+  Copy of IoT Kit - Tehqiq.md:479:   Protocols which are used by thingspeak 
+iot platform are HTTPS or MQTT for communication between the sensors and the 
+toolkit. Thingspeak uses MathWorks cloud infrastructure for analysis of the 
+data, so as an end user i don't have to worry about the cloud configurations; 
+the process of sending sensor data to the cloud is automatic.   
+  Copy of IoT Kit - Tehqiq.md:480:   Supported hardware is Arduino, R pi, and 
+ESP32. Another good feature of thingspeak is that we have the ability to see 
+real time analysis as we keep on getting the data from the sensor. One of the 
+example dashboard is shown below:   
+> Copy of IoT Kit - Tehqiq.md:481:   ![][image1]  
+  Copy of IoT Kit - Tehqiq.md:482:     
+  Copy of IoT Kit - Tehqiq.md:483:   Another good feature of thingspeak is 
+that it is integrated with matlab so once we set up our channel which we have 
+to make in the first step A channel in ThingSpeak is like a container for your 
+data. Each channel can have up to 8 fields (e.g., temperature, humidity, 
+pressure), after setting up the channel we have to just connect our sensor 
+with thingspeak that is done usually through Arduino IDE. we sent HTTPS or set 
+field requests which then sends data to the thingspeak platform and then based 
+on the fields we setted it shows us the real time analysis of it and then we 
+have the built in option to use Matlab analysis which would open up this 
+configuration in the matlab environment.   
+  Copy of IoT Kit - Tehqiq.md:663:* Connect the other LED lead to GND through 
+a current-limiting resistor (220Ω-330Ω).
+  Copy of IoT Kit - Tehqiq.md:664:
+> Copy of IoT Kit - Tehqiq.md:665:![][image2]
+  Copy of IoT Kit - Tehqiq.md:666:
+  Copy of IoT Kit - Tehqiq.md:667:### **Step 4: Writing the Code**
+  Copy of IoT Kit - Tehqiq.md:845:For the IoT kit, we need a code to connect 
+more than one sensor and make ourselves able to transfer those data from 
+different sensors into AWS through MQTT. To do that we are using this code 
+with sensor integration of DHT22 (Humidity, and Temperature), LDR, Vibration, 
+IR Distance, and Tilt Sensor. Connections graph and code is given below (Code 
+required secret.h file):
+  Copy of IoT Kit - Tehqiq.md:846:
+> Copy of IoT Kit - Tehqiq.md:847:![][image3]
+  Copy of IoT Kit - Tehqiq.md:848:
+  Copy of IoT Kit - Tehqiq.md:849:| \#include "secrets.h"\#include 
+\<WiFiClientSecure.h\>\#include \<PubSubClient.h\>\#include 
+\<ArduinoJson.h\>\#include "WiFi.h"\#include "DHT.h"\#define 
+IR\_SENSOR\_PIN 32\#define VIBRATION\_PIN 33\#define DHT\_PIN 27\#define 
+DHT\_TYPE DHT11\#define LIGHT\_SENSOR\_PIN 34\#define TILT\_SENSOR\_PIN 
+15\#define AWS\_IOT\_PUBLISH\_TOPIC   "esp32/pub"\#define 
+AWS\_IOT\_SUBSCRIBE\_TOPIC "esp32/sub"float h \= 0.0;float t \= 0.0;float 
+ds \= 0.0;int v \= 0;int ti \= 0;float l \= 0.0;DHT dht(DHT\_PIN, 
+DHT\_TYPE);WiFiClientSecure net;PubSubClient client(net);void 
+messageHandler(char\* topic, byte\* payload, unsigned int length) {  
+Serial.print("Message received on topic: ");  Serial.println(topic);  
+StaticJsonDocument\<200\> doc;  deserializeJson(doc, payload);  const char\* 
+message \= doc\["message"\];  Serial.println(message);}void connectAWS() 
+{  WiFi.mode(WIFI\_STA);  WiFi.begin(WIFI\_SSID, WIFI\_PASSWORD);  
+Serial.print("Connecting to Wi-Fi");  while (WiFi.status() \!= WL\_CONNECTED) 
+{    delay(500);    Serial.print(".");  }  net.setCACert(AWS\_CERT\_CA);  
+net.setCertificate(AWS\_CERT\_CRT);  net.setPrivateKey(AWS\_CERT\_PRIVATE); 
+ client.setServer(AWS\_IOT\_ENDPOINT, 8883);  
+client.setCallback(messageHandler);  Serial.println("\\nConnecting to AWS 
+IoT...");  while (\!client.connect(THINGNAME)) {    Serial.print(".");    
+delay(100);  }  if (\!client.connected()) {    Serial.println("AWS IoT 
+Connection Timeout\!");    return;  }  
+client.subscribe(AWS\_IOT\_SUBSCRIBE\_TOPIC);  Serial.println("AWS IoT 
+Connected\!");}void publishMessage() {  StaticJsonDocument\<1000\> doc;  
+doc\["humidity"\] \= h;  doc\["temperature"\] \= t;  doc\["distance"\] \= 
+ds;  doc\["light"\] \= l;  doc\["tilt"\] \= ti;  doc\["vibration"\] \= v;  
+char jsonBuffer\[1024\];  serializeJson(doc, jsonBuffer);  
+client.publish(AWS\_IOT\_PUBLISH\_TOPIC, jsonBuffer);}void setup() {  
+Serial.begin(115200);  dht.begin();  connectAWS();}void loop() {  int 
+irValue \= analogRead(IR\_SENSOR\_PIN);  ds \= (irValue \> 50) ? (irValue / 
+9.766) : 0; *// ds \= distance*  l \= analogRead(LIGHT\_SENSOR\_PIN); *// L 
+\= light intensity*  l \= (l \> 50) ? l : 0;  *// Digital reads*  int vRaw 
+\= digitalRead(VIBRATION\_PIN);  int tiRaw \= 
+digitalRead(TILT\_SENSOR\_PIN);  v \= (vRaw \!= HIGH && vRaw \!= LOW) ? 0 : 
+vRaw; *// v \= vibration*  ti \= (tiRaw \!= HIGH && tiRaw \!= LOW) ? 0 : 
+tiRaw; *// ti \= tilt*  *// DHT readings*  t \= dht.readTemperature();  *// 
+t \= temperature*  h \= dht.readHumidity();     *// h \= humidity*  if 
+(isnan(h) || isnan(t)) {    Serial.println("Failed to read from DHT 
+sensor\!");    return;  }  publishMessage();  client.loop();  
+delay(1000);} |
+  Copy of IoT Kit - Tehqiq.md:1567:Code for that day is below, using NTP for 
+synchronizing the time and hence making possible the TLS handshake. 
+  Copy of IoT Kit - Tehqiq.md:1568:
+> Copy of IoT Kit - Tehqiq.md:1569:![][image4]
+  Copy of IoT Kit - Tehqiq.md:1570:
+  Copy of IoT Kit - Tehqiq.md:1571:SS is attached to show the timing 
+difference if i had not used NTP- \- \- \- \-\> hence no TLS handshake \- \- 
+\- \- \- \> no connection to AWS iot Core.
+  Copy of IoT Kit - Tehqiq.md:2199:This acts as an intermediate topic that 
+temporarily holds enriched data before it is further processed.
+  Copy of IoT Kit - Tehqiq.md:2200:
+> Copy of IoT Kit - Tehqiq.md:2201:![][image5]  
+  Copy of IoT Kit - Tehqiq.md:2202:---
+  Copy of IoT Kit - Tehqiq.md:2203:
+  Copy of IoT Kit - Tehqiq.md:2425:This was verified by checking the **S3 
+Management Console**, where the uploaded files were visible with their 
+appropriate content and timestamp-based names.
+  Copy of IoT Kit - Tehqiq.md:2426:
+> Copy of IoT Kit - Tehqiq.md:2427:![][image6]
+  Copy of IoT Kit - Tehqiq.md:2428:
+  Copy of IoT Kit - Tehqiq.md:2429:**Final Code**
+  Copy of IoT Kit - Tehqiq.md:2757:## 
+  Copy of IoT Kit - Tehqiq.md:2758:
+> Copy of IoT Kit - Tehqiq.md:2759:![][image7]
+  Copy of IoT Kit - Tehqiq.md:2760:
+  Copy of IoT Kit - Tehqiq.md:2761:## **1 · Create the DynamoDB tables (2 min 
+each)**
+  Copy of IoT Kit - Tehqiq.md:2983:
+  Copy of IoT Kit - Tehqiq.md:2984:Then set the instance name and the machine 
+OS which in our case we did this:  
+> Copy of IoT Kit - Tehqiq.md:2985:![][image8]
+  Copy of IoT Kit - Tehqiq.md:2986:
+  Copy of IoT Kit - Tehqiq.md:2987:After this click on create a new key pair, 
+keep these settings of it:
+  Copy of IoT Kit - Tehqiq.md:2988:
+> Copy of IoT Kit - Tehqiq.md:2989:![][image9]
+  Copy of IoT Kit - Tehqiq.md:2990:
+  Copy of IoT Kit - Tehqiq.md:2991:Click on create key pair and then download 
+it, that would not be used in our scenario but could be used in cases of 
+remote access to this instance.
+  Copy of IoT Kit - Tehqiq.md:2993:Then make sure to keep these settings:
+  Copy of IoT Kit - Tehqiq.md:2994:
+> Copy of IoT Kit - Tehqiq.md:2995:![][image10]
+  Copy of IoT Kit - Tehqiq.md:2996:
+  Copy of IoT Kit - Tehqiq.md:2997:Keep other settings as it as and then click 
+on launch instance button located towards bottom right.
+  Copy of IoT Kit - Tehqiq.md:3042:2) Then click on instance ID of your 
+instance.   
+  Copy of IoT Kit - Tehqiq.md:3043:3) Then click on the Security option below 
+there  
+> Copy of IoT Kit - Tehqiq.md:3044:   ![][image11]  
+  Copy of IoT Kit - Tehqiq.md:3045:     
+  Copy of IoT Kit - Tehqiq.md:3046:4) Then click on the security groups link 
+shown in blue. The one with the wizard etc.  
+  Copy of IoT Kit - Tehqiq.md:3047:5) After clicking on it this would load:   
+> Copy of IoT Kit - Tehqiq.md:3048:   ![][image12]
+  Copy of IoT Kit - Tehqiq.md:3049:
+  Copy of IoT Kit - Tehqiq.md:3050:Here click on edit inbound rules and allow 
+custom TCP on the 3000 port. Thats it now the traffic can reach the EC2 server 
+which we deployed.
+  Copy of IoT Kit - Tehqiq.md:3053:
+  Copy of IoT Kit - Tehqiq.md:3054:Click on instances option on EC2 where it 
+will show all instances deployed:  
+> Copy of IoT Kit - Tehqiq.md:3055:![][image13]
+  Copy of IoT Kit - Tehqiq.md:3056:
+  Copy of IoT Kit - Tehqiq.md:3057:From here see on the instance you just 
+created and click on the instance id which is highlighted in blue, then this 
+screen would load:   
+> Copy of IoT Kit - Tehqiq.md:3058:![][image14]
+  Copy of IoT Kit - Tehqiq.md:3059:
+  Copy of IoT Kit - Tehqiq.md:3060:Click on the connect option.
+  Copy of IoT Kit - Tehqiq.md:3061:
+> Copy of IoT Kit - Tehqiq.md:3062:![][image15]
+  Copy of IoT Kit - Tehqiq.md:3063:
+  Copy of IoT Kit - Tehqiq.md:3064:Now click on the connect option here again, 
+this would bring you here:
+  Copy of IoT Kit - Tehqiq.md:3065:
+> Copy of IoT Kit - Tehqiq.md:3066:![][image16]
+  Copy of IoT Kit - Tehqiq.md:3067:
+  Copy of IoT Kit - Tehqiq.md:3068:Now follow these commands only:
+  Copy of IoT Kit - Tehqiq.md:3079:First of all visit to this AWS IoT core, on 
+left side scroll down to option of settings: 
+  Copy of IoT Kit - Tehqiq.md:3080:
+> Copy of IoT Kit - Tehqiq.md:3081:**![][image17]**
+  Copy of IoT Kit - Tehqiq.md:3082:
+  Copy of IoT Kit - Tehqiq.md:3083:Here click on settings, then this screen 
+would load:   
+> Copy of IoT Kit - Tehqiq.md:3084:**![][image18]**
+  Copy of IoT Kit - Tehqiq.md:3085:
+  Copy of IoT Kit - Tehqiq.md:3086:Here click on ‘manage logs’ option in the 
+logs area. Then this screen would be shown:
+  Copy of IoT Kit - Tehqiq.md:3087:
+> Copy of IoT Kit - Tehqiq.md:3088:![][image19]  
+  Copy of IoT Kit - Tehqiq.md:3089:Here please some info regarding this role, 
+why it is needed etc:
+  Copy of IoT Kit - Tehqiq.md:3090:
+  Copy of IoT Kit - Tehqiq.md:3097:
+  Copy of IoT Kit - Tehqiq.md:3098:Now here what we need to do next is that 
+click on the create role button:  
+> Copy of IoT Kit - Tehqiq.md:3099:![][image20]
+  Copy of IoT Kit - Tehqiq.md:3100:
+  Copy of IoT Kit - Tehqiq.md:3101:Keep some name of the role that you are 
+making like this:   
+> Copy of IoT Kit - Tehqiq.md:3102:![][image21]
+  Copy of IoT Kit - Tehqiq.md:3103:
+  Copy of IoT Kit - Tehqiq.md:3104:Then click on create, then this screen 
+would show: 
+  Copy of IoT Kit - Tehqiq.md:3105:
+> Copy of IoT Kit - Tehqiq.md:3106:![][image22]  
+  Copy of IoT Kit - Tehqiq.md:3107:There are various log levels available 
+which are actually the level and intensity of logging that you need, in our 
+case we chose ‘informational’ , so make sure to select that level.  
+  Copy of IoT Kit - Tehqiq.md:3108:Once selected the **log level** now click 
+on update. Then this screen would be shown: 
+  Copy of IoT Kit - Tehqiq.md:3109:
+> Copy of IoT Kit - Tehqiq.md:3110:![][image23]
+  Copy of IoT Kit - Tehqiq.md:3111:
+  Copy of IoT Kit - Tehqiq.md:3112:This shows that our role has been created 
+and says logging has been successfully updated. 
+  Copy of IoT Kit - Tehqiq.md:3120:First of all go to AWS SNS by searching in 
+the search panel for ‘sns’. Once visited SNS then this screen would be shown: 
+  Copy of IoT Kit - Tehqiq.md:3121:
+> Copy of IoT Kit - Tehqiq.md:3122:![][image24]
+  Copy of IoT Kit - Tehqiq.md:3123:
+  Copy of IoT Kit - Tehqiq.md:3124:Here choose the topic name that you want to 
+keep for the SNS topic. Like here I have kept a tutorial\_topic as name of my 
+SNS topic. Then click on next step. Then this screen would be shown.   
+> Copy of IoT Kit - Tehqiq.md:3125:![][image25]
+  Copy of IoT Kit - Tehqiq.md:3126:
+  Copy of IoT Kit - Tehqiq.md:3127:Here select the standard. And below that 
+all settings are optional which we did not     explore yet. So just keep 
+scrolling down and click on **create topic** button.
+  Copy of IoT Kit - Tehqiq.md:3129:Then this screen would be shown: 
+  Copy of IoT Kit - Tehqiq.md:3130:
+> Copy of IoT Kit - Tehqiq.md:3131:![][image26]  
+  Copy of IoT Kit - Tehqiq.md:3132:Here then click on **create subscription.** 
+By creating subscription(s) we are actually giving an endpoint like phone 
+number or email address to our SNS topic where it will direct the 
+notifications. Showing configuration for adding a phone number as subscriber. 
+Remember that whenever you create a new topic you will have to add 
+subscriber(s) again. **After clicking on create subscription then this screen 
+would load:**
+  Copy of IoT Kit - Tehqiq.md:3133:
+> Copy of IoT Kit - Tehqiq.md:3134:**![][image27]**  
+  Copy of IoT Kit - Tehqiq.md:3135:Here you dont need to be concerned about 
+the topic ARN, it is configured automatically. You just need to select the 
+protocol through which the notification would be sent, depending on your 
+endpoint. Since we are doing for phone number then select SMS.   
+> Copy of IoT Kit - Tehqiq.md:3136:![][image28]
+  Copy of IoT Kit - Tehqiq.md:3137:
+  Copy of IoT Kit - Tehqiq.md:3138:Now you will have to select the endpoint, 
+here it will only show endpoints that you have configured previously, if not 
+then click on the add phone number option shown in this above picture and it 
+will take you to another screen where you will have to add your phone number 
+and a OTP would be sent to that number you will have to just enter it, this is 
+simply AWS verification nothing else. Once adding the number there come back 
+on this above same screen and then click on **“Create subscription”** button.  
+> Copy of IoT Kit - Tehqiq.md:3139:![][image29]  
+  Copy of IoT Kit - Tehqiq.md:3140:Now by doing so we have configured the 
+endpoint of our SNS and the SNS topic itself too. 
+  Copy of IoT Kit - Tehqiq.md:3141:
+  Copy of IoT Kit - Tehqiq.md:3144:First of all go to AWS cloudwatch then this 
+screen would show, here click on in alarms option on left: 
+  Copy of IoT Kit - Tehqiq.md:3145:
+> Copy of IoT Kit - Tehqiq.md:3146:![][image30]
+  Copy of IoT Kit - Tehqiq.md:3147:
+  Copy of IoT Kit - Tehqiq.md:3148:After clicking on in alarm option this 
+would show: 
+  Copy of IoT Kit - Tehqiq.md:3149:
+> Copy of IoT Kit - Tehqiq.md:3150:![][image31]
+  Copy of IoT Kit - Tehqiq.md:3151:
+  Copy of IoT Kit - Tehqiq.md:3152:Here click on create alarm
+  Copy of IoT Kit - Tehqiq.md:3153:
+  Copy of IoT Kit - Tehqiq.md:3154:Then this screen would be shown:   
+> Copy of IoT Kit - Tehqiq.md:3155:![][image32]
+  Copy of IoT Kit - Tehqiq.md:3156:
+  Copy of IoT Kit - Tehqiq.md:3157:Here click on **Select metric** option. 
+Then this screen would be shown: 
+  Copy of IoT Kit - Tehqiq.md:3158:
+> Copy of IoT Kit - Tehqiq.md:3159:![][image33]
+  Copy of IoT Kit - Tehqiq.md:3160:
+  Copy of IoT Kit - Tehqiq.md:3161:From here click on IoT shown in pic above: 
+  Copy of IoT Kit - Tehqiq.md:3163:Then after clicking on IoT this would be 
+shown: 
+  Copy of IoT Kit - Tehqiq.md:3164:
+> Copy of IoT Kit - Tehqiq.md:3165:![][image34]
+  Copy of IoT Kit - Tehqiq.md:3166:
+  Copy of IoT Kit - Tehqiq.md:3167:From here select the option rule metrics.
+  Copy of IoT Kit - Tehqiq.md:3168:
+> Copy of IoT Kit - Tehqiq.md:3169:![][image35]  
+  Copy of IoT Kit - Tehqiq.md:3170:Then this would be shown from here select 
+the rule name which is the latest one that you configured. These are AWS IoT 
+Core Rules that have been created in your AWS account. **IoT Rules are used to 
+process and route messages from IoT devices**. Each rule shown here represents 
+a different message processing rule:
+  Copy of IoT Kit - Tehqiq.md:3171:
+  Copy of IoT Kit - Tehqiq.md:3179:
+  Copy of IoT Kit - Tehqiq.md:3180:Once selected the rule then this screen 
+will be shown :   
+> Copy of IoT Kit - Tehqiq.md:3181:![][image36]  
+  Copy of IoT Kit - Tehqiq.md:3182:From here: 
+  Copy of IoT Kit - Tehqiq.md:3183:
+  Copy of IoT Kit - Tehqiq.md:3217:Scroll down then this screen will be shown: 
+  Copy of IoT Kit - Tehqiq.md:3218:
+> Copy of IoT Kit - Tehqiq.md:3219:![][image37]
+  Copy of IoT Kit - Tehqiq.md:3220:
+  Copy of IoT Kit - Tehqiq.md:3221:## 
+  Copy of IoT Kit - Tehqiq.md:3269:User can set the alarm as per their 
+requirement after reading this, once configured these steps then click on 
+**next step** and then this screen will be shown: 
+  Copy of IoT Kit - Tehqiq.md:3270:
+> Copy of IoT Kit - Tehqiq.md:3271:![][image38]
+  Copy of IoT Kit - Tehqiq.md:3272:
+  Copy of IoT Kit - Tehqiq.md:3273:This above screen is very important since 
+here you will be routing your alarm actions, in our case since we are 
+integrating it with SNS so that user should receive notification whenever a 
+trigger is achieved, so here we will keep SNS as the primary focus.
+  Copy of IoT Kit - Tehqiq.md:3320:For our setting click on existing topics 
+and select the SNS topic that you made by following this guide
+  Copy of IoT Kit - Tehqiq.md:3321:
+> Copy of IoT Kit - Tehqiq.md:3322:![][image39]
+  Copy of IoT Kit - Tehqiq.md:3323:
+  Copy of IoT Kit - Tehqiq.md:3324:Scroll down and then ignore other options 
+of EC2 etc and click on **next**
+  Copy of IoT Kit - Tehqiq.md:3326:Then this screen would be shown, here name 
+your alarm and the message that you want to send to the user once the alarm 
+condition is met, like this:
+  Copy of IoT Kit - Tehqiq.md:3327:
+> Copy of IoT Kit - Tehqiq.md:3328:![][image40]  
+  Copy of IoT Kit - Tehqiq.md:3329:Then click on **next**   
+  Copy of IoT Kit - Tehqiq.md:3330:Then finally click on **create alarm** 
+option. Thats it now our alarm is created and user will receive the 
+notification whenever the alarm condition is met.
+  Copy of IoT Kit - Tehqiq.md:3331:
+> Copy of IoT Kit - Tehqiq.md:3332:![][image41]
+  Copy of IoT Kit - Tehqiq.md:3333:
+  Copy of IoT Kit - Tehqiq.md:3334:# Mil14-SNS+lambda
+  Copy of IoT Kit - Tehqiq.md:3339:
+  Copy of IoT Kit - Tehqiq.md:3340:This is what our final topology would look 
+like:   
+> Copy of IoT Kit - Tehqiq.md:3341:![][image42]
+  Copy of IoT Kit - Tehqiq.md:3342:
+  Copy of IoT Kit - Tehqiq.md:3343:Here make the lambda function by the steps 
+as we have been making, in triggers add the service for **AWS IoT** then we 
+will come on the section of lambda function code, which is attached below, 
+paste it as it as: 
+  Copy of IoT Kit - Tehqiq.md:3403:1) Go to AWS SNS, there click on the left 
+plane on **topics** button  
+  Copy of IoT Kit - Tehqiq.md:3404:     
+> Copy of IoT Kit - Tehqiq.md:3405:   ![][image43]  
+  Copy of IoT Kit - Tehqiq.md:3406:     
+  Copy of IoT Kit - Tehqiq.md:3407:   From here click on the latest topic or 
+the topic where you have already configured your desired settings. Click on 
+the topic name being shown in blue. Then this screen would be shown.   
+  Copy of IoT Kit - Tehqiq.md:3408:     
+> Copy of IoT Kit - Tehqiq.md:3409:   ![][image44]  
+  Copy of IoT Kit - Tehqiq.md:3410:     
+  Copy of IoT Kit - Tehqiq.md:3411:     
+  Copy of IoT Kit - Tehqiq.md:3419:**Integrating Accelerometer**
+  Copy of IoT Kit - Tehqiq.md:3420:
+> Copy of IoT Kit - Tehqiq.md:3421:**![][image45]**
+  Copy of IoT Kit - Tehqiq.md:3422:
+  Copy of IoT Kit - Tehqiq.md:3423:The gyroscope measures rotational velocity 
+(rad/s), this is the change of the angular position over time along the X, Y 
+and Z axis (roll, pitch and yaw). This allows us to determine the orientation 
+of an object.
+  Copy of IoT Kit - Tehqiq.md:3424:
+> Copy of IoT Kit - Tehqiq.md:3425:![][image46]
+  Copy of IoT Kit - Tehqiq.md:3426:
+  Copy of IoT Kit - Tehqiq.md:3427:The accelerometer measures acceleration 
+(rate of change of the object’s velocity). It senses static forces like 
+gravity (9.8m/s2) or dynamic forces like vibrations or movement. The MPU-6050 
+measures acceleration over the X, Y an Z axis. Ideally, in a static object the 
+acceleration over the Z axis is equal to the gravitational force, and it 
+should be zero on the X and Y axis.
+  Copy of IoT Kit - Tehqiq.md:3429:Using the values from the accelerometer, it 
+is possible to calculate the roll and pitch angles using trigonometry. 
+However, it is not possible to calculate the yaw. But why? That's because the 
+accelerometer is based on gravity and gravity helps correct pitch/roll but not 
+yaw, because gravity acts vertically and gives no info about horizontal 
+rotation. Hence accelerometer does not gives accurate yaw value even if we 
+derive it using formulas.
+  Copy of IoT Kit - Tehqiq.md:3430:
+> Copy of IoT Kit - Tehqiq.md:3431:![][image47]
+  Copy of IoT Kit - Tehqiq.md:3432:
+  Copy of IoT Kit - Tehqiq.md:3433:Connect GND of sensor with GND of esp32   
+
+

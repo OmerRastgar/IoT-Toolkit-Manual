@@ -2,6 +2,8 @@
 
 Full system code combining all components.
 
+![System Architecture](../assets/images/toolkit/architecture.png)
+
 ## Overview
 
 This code integrates:
