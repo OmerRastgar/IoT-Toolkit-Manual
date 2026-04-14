@@ -2,6 +2,10 @@
 
 A student-friendly guide for building and configuring IoT systems with ESP32, sensors, displays, and cloud connectivity.
 
+> [!TIP]
+> **Jump to the Full System**
+> If you have all your hardware components connected and just want the firmware to get started, go directly to the [**Complete Integration Code**](integration/complete-code.md).
+
 ## What You'll Learn
 
 This guide will walk you through:
