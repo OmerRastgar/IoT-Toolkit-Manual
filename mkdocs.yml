@@ -170,5 +170,7 @@ nav:
     - troubleshooting/software-issues.md
   - Resources:
     - resources/index.md
+    - Contributors: contributors.md
     - resources/glossary.md
     - resources/references.md
+

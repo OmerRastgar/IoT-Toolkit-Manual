@@ -1,6 +1,7 @@
 <div align="center">
-  <img src="assets/images/toolkit/habib-university-logo.png" width="300">
+  <img src="assets/images/toolkit/habib-university-logo.png" width="500">
 </div>
+
 
 # IoT Toolkit Manual
 
