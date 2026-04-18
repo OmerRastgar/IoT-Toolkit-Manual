@@ -1,19 +1,4 @@
-<div align="center">
-  <img src="assets/images/toolkit/habib-university-logo.png" width="300">
-</div>
-
 # IoT Toolkit Manual
-
-
-
-![IoT Architecture](assets/images/toolkit/iot-architecture-new.png)
-
-
-A student-friendly guide for building and configuring IoT systems with ESP32, sensors, displays, and cloud connectivity.
-
-!!! tip "Jump to the Full System"
-    If you have all your hardware components connected and just want the firmware to get started, go directly to the [**Complete Integration Code**](integration/complete-code.md).
-
 
 ## What You'll Learn
 
@@ -25,6 +10,17 @@ This guide will walk you through:
 - **[Communication](hardware/communication/index.md)**: Use WiFi with MQTT, HTTP, and CoAP protocols
 - **[Cloud Deployment](cloud/index.md)**: Connect to AWS IoT Core or set up your own server
 - **[Troubleshooting](troubleshooting/index.md)**: Solve common hardware and software issues
+
+![IoT Architecture](assets/images/toolkit/iot-architecture-new.png)
+
+
+A student-friendly guide for building and configuring IoT systems with ESP32, sensors, displays, and cloud connectivity.
+
+!!! tip "Jump to the Full System"
+    If you have all your hardware components connected and just want the firmware to get started, go directly to the [**Complete Integration Code**](integration/complete-code.md).
+
+
+
 
 ## Core Components
 
