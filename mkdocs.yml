@@ -131,9 +131,9 @@ nav:
     - hardware/esp32.md
     - Sensors:
       - hardware/sensors/index.md
-      - hardware/sensors/temperature.md
-      - hardware/sensors/humidity.md
-      - hardware/sensors/vibration.md
+      - DHT Sensor: hardware/sensors/dht-sensor.md
+      - ADXL335 (Analog): hardware/sensors/adxl335.md
+      - MPU6050 (Digital I2C): hardware/sensors/mpu6050.md
 
     - Displays:
       - hardware/displays/index.md
@@ -144,6 +144,7 @@ nav:
       - hardware/modules/i2c-multiplexer.md
       - hardware/modules/voice.md
       - hardware/modules/camera.md
+    - Power Source: hardware/power-source.md
     - Communication:
       - hardware/communication/index.md
       - hardware/communication/mqtt.md
