@@ -4,18 +4,29 @@
 
 ## Overview
 
-<!-- TODO: Add description from source file -->
+The humidity and temperature sensors in this toolkit are combined into a single **DHT (Digital Humidity and Temperature)** sensor module. 
+
+![DHT11 and DHT22 Sensors](../../assets/images/toolkit/DHT11-and-DHT22-Sensors.jpg)
+
+## DHT Versions
+
+The toolkit utilizes either the **DHT11** or **DHT22** sensor. While they look similar, they have different specifications:
+
+| Feature | DHT11 (Blue) | DHT22 (White) |
+|---------|--------------|---------------|
+| **Humidity Range** | 20% to 80% | 0% to 100% |
+| **Humidity Accuracy** | ±5% | ±2-5% |
+| **Temperature Range** | 0°C to 50°C | -40°C to 80°C |
+| **Sampling Rate** | 1 Hz | 0.5 Hz |
 
 ## Specifications
 
 | Parameter | Value |
 |-----------|-------|
-| Model | <!-- TODO: Add --> |
-| Interface | <!-- TODO: Add --> |
-| Measurement Range | <!-- TODO: Add --> |
-| Accuracy | <!-- TODO: Add --> |
-| Operating Voltage | <!-- TODO: Add --> |
-| I2C Address | <!-- TODO: Add --> |
+| Model | DHT11 / DHT22 |
+| Interface | Single-bus Digital |
+| Operating Voltage | 3.3V - 5V |
+
 
 ## Pinout
 

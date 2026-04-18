@@ -70,10 +70,10 @@ Two deployment methods are supported:
 4. [Create rules for data storage](aws.md)
 
 ### Self-Hosted Path
-1. [Set up MQTT broker (Mosquitto)](self-hosted.md)
-2. [Configure database](self-hosted.md)
-3. [Install Grafana dashboard](self-hosted.md)
-4. [Connect ESP32](self-hosted.md)
+1. [Launch the IoT Toolkit Stack (Docker)](self-hosted.md#option-c-zero-touch-docker-setup-recommended)
+2. [Verify Zero-Touch Authentication](self-hosted.md)
+3. [Configure ESP32 Local Server IP](self-hosted.md)
+4. [View data in InfluxDB](self-hosted.md)
 
 ## Protocol Support
 
@@ -131,13 +131,11 @@ Set up notifications for:
 | Medium (5 devices, 1 msg/sec) | $10-20 |
 | High (25 devices, 10 msg/sec) | $50-100 |
 
-### Self-Hosted (Estimated)
-| Component | Cost |
-|-----------|------|
-| Raspberry Pi 4 | $75 (one-time) |
-| Cloud VM (small) | $5-10/month |
-| Electricity (Pi) | $2/month |
-| Domain (optional) | $10/year |
+### Self-Hosted (Development)
+For students and developers, you can run the entire IoT stack on your **Personal Computer** using **Docker**. This approach has **zero cost** and is ideal for learning, testing, and rapid development.
+
+- [Docker Setup Guide](self-hosted.md#option-c-zero-touch-docker-setup-recommended)
+
 
 ## Next Steps
 

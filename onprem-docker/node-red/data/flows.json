@@ -1,0 +1,287 @@
+[
+    {
+        "id": "eeab10f278987e52",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1dfacef805ec88aa",
+        "type": "mqtt-broker",
+        "name": "IoT MQTT Broker",
+        "broker": "192.168.100.4",
+        "port": 1883,
+        "clientid": "nodeRed_Listner",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d4c3884f5a6bcbdf",
+        "type": "coap-server",
+        "name": "IoT CoAP Server",
+        "port": 5683,
+        "ipv6": false
+    },
+    {
+        "id": "influxdb_config",
+        "type": "influxdb",
+        "hostname": "influxdb",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "IoT InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://influxdb:8086",
+        "timeout": "10",
+        "rejectUnauthorized": true,
+        "token": "${INFLUX_TOKEN}"
+    },
+    {
+        "id": "4b57c28260ba1332",
+        "type": "mqtt in",
+        "z": "eeab10f278987e52",
+        "name": "ESP32 MQTT Listener",
+        "topic": "esp32/pub",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "1dfacef805ec88aa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 720,
+        "y": 280,
+        "wires": [
+            [
+                "mqtt_metadata_tag"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_metadata_tag",
+        "type": "function",
+        "z": "eeab10f278987e52",
+        "name": "Tag: MQTT",
+        "func": "msg.protocol = 'mqtt';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 280,
+        "wires": [
+            [
+                "e79f7503fa6dc610",
+                "json_parse_coap"
+            ]
+        ]
+    },
+    {
+        "id": "e79f7503fa6dc610",
+        "type": "debug",
+        "z": "eeab10f278987e52",
+        "name": "MQTT Data Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "9ee6469c1856cde1",
+        "type": "http in",
+        "z": "eeab10f278987e52",
+        "name": "ESP32 HTTP Listener",
+        "url": "/telemetry",
+        "method": "post",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 720,
+        "y": 440,
+        "wires": [
+            [
+                "http_metadata_tag"
+            ]
+        ]
+    },
+    {
+        "id": "http_metadata_tag",
+        "type": "function",
+        "z": "eeab10f278987e52",
+        "name": "Tag: HTTP",
+        "func": "msg.protocol = 'http';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 440,
+        "wires": [
+            [
+                "fee5ca62af17c254",
+                "76e336e889419b4e",
+                "json_parse_coap"
+            ]
+        ]
+    },
+    {
+        "id": "fee5ca62af17c254",
+        "type": "debug",
+        "z": "eeab10f278987e52",
+        "name": "HTTP Data Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "76e336e889419b4e",
+        "type": "http response",
+        "z": "eeab10f278987e52",
+        "name": "200-OK",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1340,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "coap_obs_telemetry",
+        "type": "coap in",
+        "z": "eeab10f278987e52",
+        "method": "PUT",
+        "name": "ESP32 CoAP Listener",
+        "server": "d4c3884f5a6bcbdf",
+        "url": "/telemetry",
+        "x": 730,
+        "y": 560,
+        "wires": [
+            [
+                "coap_metadata_tag",
+                "coap_response_204"
+            ]
+        ]
+    },
+    {
+        "id": "coap_metadata_tag",
+        "type": "function",
+        "z": "eeab10f278987e52",
+        "name": "Tag: CoAP",
+        "func": "msg.protocol = 'coap';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 560,
+        "wires": [
+            [
+                "json_parse_coap"
+            ]
+        ]
+    },
+    {
+        "id": "json_parse_coap",
+        "type": "json",
+        "z": "eeab10f278987e52",
+        "name": "Telemetry JSON Parser",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1030,
+        "y": 560,
+        "wires": [
+            [
+                "debug_coap",
+                "influxdb_out"
+            ]
+        ]
+    },
+    {
+        "id": "influxdb_out",
+        "type": "influxdb out",
+        "z": "eeab10f278987e52",
+        "influxdb": "influxdb_config",
+        "name": "InfluxDB Production Sink",
+        "measurement": "esp32_metrics",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "${INFLUX_ORG}",
+        "bucket": "${INFLUX_BUCKET}",
+        "x": 1330,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "debug_coap",
+        "type": "debug",
+        "z": "eeab10f278987e52",
+        "name": "CoAP Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "coap_response_204",
+        "type": "coap response",
+        "z": "eeab10f278987e52",
+        "name": "CoAP ACK",
+        "statusCode": "2.04",
+        "contentFormat": "text/plain",
+        "x": 1030,
+        "y": 600,
+        "wires": []
+    }
+]

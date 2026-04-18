@@ -1,0 +1,245 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@10.8.2
+2 info using node@v20.20.1
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/data/.npmrc
+5 silly config load:file:/usr/src/node-red/.npmrc
+6 silly config load:file:/usr/local/etc/npmrc
+7 verbose title npm install node-red-contrib-coap
+8 verbose argv "install" "node-red-contrib-coap"
+9 verbose logfile logs-max:10 dir:/data/.npm/_logs/2026-04-17T19_44_47_818Z-
+10 verbose logfile /data/.npm/_logs/2026-04-17T19_44_47_818Z-debug-0.log
+11 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly fetch manifest node-red-contrib-coap@*
+15 silly packumentCache full:https://registry.npmjs.org/node-red-contrib-coap cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/node-red-contrib-coap 1197ms (cache revalidated)
+17 silly packumentCache full:https://registry.npmjs.org/node-red-contrib-coap set size:54666 disposed:false
+18 silly placeDep ROOT node-red-contrib-coap@0.9.0 OK for: node-red-project@0.0.1 want: *
+19 silly fetch manifest cbor@^10.0.2
+20 silly packumentCache full:https://registry.npmjs.org/cbor cache-miss
+21 silly fetch manifest coap@^1.4.0
+22 silly packumentCache full:https://registry.npmjs.org/coap cache-miss
+23 silly fetch manifest h5.linkformat@0.0.0
+24 silly packumentCache full:https://registry.npmjs.org/h5.linkformat cache-miss
+25 http fetch GET 200 https://registry.npmjs.org/cbor 477ms (cache revalidated)
+26 silly packumentCache full:https://registry.npmjs.org/cbor set size:204729 disposed:false
+27 http fetch GET 200 https://registry.npmjs.org/coap 691ms (cache revalidated)
+28 silly packumentCache full:https://registry.npmjs.org/coap set size:181704 disposed:false
+29 http fetch GET 200 https://registry.npmjs.org/h5.linkformat 731ms (cache revalidated)
+30 silly packumentCache full:https://registry.npmjs.org/h5.linkformat set size:14414 disposed:false
+31 silly placeDep ROOT cbor@10.0.12 OK for: node-red-contrib-coap@0.9.0 want: ^10.0.2
+32 silly placeDep ROOT coap@1.5.0 OK for: node-red-contrib-coap@0.9.0 want: ^1.4.0
+33 silly placeDep ROOT h5.linkformat@0.0.0 OK for: node-red-contrib-coap@0.9.0 want: 0.0.0
+34 silly fetch manifest nofilter@^3.0.2
+35 silly packumentCache full:https://registry.npmjs.org/nofilter cache-miss
+36 silly fetch manifest bl@^6.0.12
+37 silly packumentCache full:https://registry.npmjs.org/bl cache-miss
+38 silly fetch manifest @types/readable-stream@^4.0.14
+39 silly packumentCache full:https://registry.npmjs.org/@types%2freadable-stream cache-miss
+40 silly fetch manifest capitalize@^2.0.4
+41 silly packumentCache full:https://registry.npmjs.org/capitalize cache-miss
+42 silly fetch manifest coap-packet@^1.1.1
+43 silly packumentCache full:https://registry.npmjs.org/coap-packet cache-miss
+44 silly fetch manifest debug@^4.3.5
+45 silly packumentCache full:https://registry.npmjs.org/debug cache-miss
+46 silly fetch manifest fastseries@^2.0.0
+47 silly packumentCache full:https://registry.npmjs.org/fastseries cache-miss
+48 silly fetch manifest lru-cache@^11.0.2
+49 silly packumentCache full:https://registry.npmjs.org/lru-cache cache-miss
+50 silly fetch manifest readable-stream@^4.5.2
+51 silly packumentCache full:https://registry.npmjs.org/readable-stream cache-miss
+52 http fetch GET 200 https://registry.npmjs.org/coap-packet 656ms (cache revalidated)
+53 silly packumentCache full:https://registry.npmjs.org/coap-packet set size:33231 disposed:false
+54 http fetch GET 200 https://registry.npmjs.org/debug 757ms (cache revalidated)
+55 silly packumentCache full:https://registry.npmjs.org/debug set size:195840 disposed:false
+56 http fetch GET 200 https://registry.npmjs.org/lru-cache 980ms (cache revalidated)
+57 silly packumentCache full:https://registry.npmjs.org/lru-cache set size:439357 disposed:false
+58 http fetch GET 200 https://registry.npmjs.org/capitalize 1279ms (cache revalidated)
+59 silly packumentCache full:https://registry.npmjs.org/capitalize set size:35889 disposed:false
+60 http fetch GET 200 https://registry.npmjs.org/fastseries 1404ms (cache revalidated)
+61 silly packumentCache full:https://registry.npmjs.org/fastseries set size:33162 disposed:false
+62 http fetch GET 200 https://registry.npmjs.org/bl 1953ms (cache miss)
+63 silly packumentCache full:https://registry.npmjs.org/bl set size:undefined disposed:false
+64 http fetch GET 200 https://registry.npmjs.org/readable-stream 2128ms (cache miss)
+65 silly packumentCache full:https://registry.npmjs.org/readable-stream set size:undefined disposed:false
+66 http fetch GET 200 https://registry.npmjs.org/@types%2freadable-stream 2177ms (cache miss)
+67 silly packumentCache full:https://registry.npmjs.org/@types%2freadable-stream set size:undefined disposed:false
+68 http fetch GET 200 https://registry.npmjs.org/nofilter 3401ms (cache revalidated)
+69 silly packumentCache full:https://registry.npmjs.org/nofilter set size:83253 disposed:false
+70 silly placeDep ROOT nofilter@3.1.0 OK for: cbor@10.0.12 want: ^3.0.2
+71 silly placeDep ROOT @types/readable-stream@4.0.23 OK for: coap@1.5.0 want: ^4.0.14
+72 silly placeDep ROOT bl@6.1.6 OK for: coap@1.5.0 want: ^6.0.12
+73 silly placeDep ROOT capitalize@2.0.4 OK for: coap@1.5.0 want: ^2.0.4
+74 silly placeDep ROOT coap-packet@1.1.1 OK for: coap@1.5.0 want: ^1.1.1
+75 silly placeDep ROOT debug@4.4.3 OK for: coap@1.5.0 want: ^4.3.5
+76 silly placeDep ROOT fastseries@2.0.0 OK for: coap@1.5.0 want: ^2.0.0
+77 silly placeDep ROOT lru-cache@11.3.5 OK for: coap@1.5.0 want: ^11.0.2
+78 silly placeDep ROOT readable-stream@4.7.0 OK for: coap@1.5.0 want: ^4.5.2
+79 silly fetch manifest @types/node@*
+80 silly packumentCache full:https://registry.npmjs.org/@types%2fnode cache-miss
+81 silly fetch manifest buffer@^6.0.3
+82 silly packumentCache full:https://registry.npmjs.org/buffer cache-miss
+83 silly fetch manifest inherits@^2.0.4
+84 silly packumentCache full:https://registry.npmjs.org/inherits cache-miss
+85 silly fetch manifest readable-stream@^4.2.0
+86 silly packumentCache full:https://registry.npmjs.org/readable-stream cache-miss
+87 silly fetch manifest ms@^2.1.3
+88 silly packumentCache full:https://registry.npmjs.org/ms cache-miss
+89 silly fetch manifest abort-controller@^3.0.0
+90 silly packumentCache full:https://registry.npmjs.org/abort-controller cache-miss
+91 silly fetch manifest buffer@^6.0.3
+92 silly packumentCache full:https://registry.npmjs.org/buffer cache-miss
+93 silly fetch manifest events@^3.3.0
+94 silly packumentCache full:https://registry.npmjs.org/events cache-miss
+95 silly fetch manifest process@^0.11.10
+96 silly packumentCache full:https://registry.npmjs.org/process cache-miss
+97 silly fetch manifest string_decoder@^1.3.0
+98 silly packumentCache full:https://registry.npmjs.org/string_decoder cache-miss
+99 http fetch GET 200 https://registry.npmjs.org/readable-stream 29ms (cache hit)
+100 silly packumentCache full:https://registry.npmjs.org/readable-stream set size:261096 disposed:false
+101 http fetch GET 200 https://registry.npmjs.org/ms 187ms (cache revalidated)
+102 silly packumentCache full:https://registry.npmjs.org/ms set size:92208 disposed:false
+103 http fetch GET 200 https://registry.npmjs.org/process 206ms (cache miss)
+104 silly packumentCache full:https://registry.npmjs.org/process set size:undefined disposed:false
+105 http fetch GET 200 https://registry.npmjs.org/abort-controller 209ms (cache miss)
+106 silly packumentCache full:https://registry.npmjs.org/abort-controller set size:undefined disposed:false
+107 http fetch GET 200 https://registry.npmjs.org/inherits 213ms (cache miss)
+108 silly packumentCache full:https://registry.npmjs.org/inherits set size:undefined disposed:false
+109 http fetch GET 200 https://registry.npmjs.org/events 242ms (cache miss)
+110 silly packumentCache full:https://registry.npmjs.org/events set size:undefined disposed:false
+111 http fetch GET 200 https://registry.npmjs.org/buffer 250ms (cache miss)
+112 silly packumentCache full:https://registry.npmjs.org/buffer set size:undefined disposed:false
+113 http fetch GET 200 https://registry.npmjs.org/buffer 256ms (cache miss)
+114 silly packumentCache full:https://registry.npmjs.org/buffer set size:undefined disposed:false
+115 http fetch GET 200 https://registry.npmjs.org/string_decoder 269ms (cache miss)
+116 silly packumentCache full:https://registry.npmjs.org/string_decoder set size:undefined disposed:false
+117 http fetch GET 200 https://registry.npmjs.org/@types%2fnode 1707ms (cache miss)
+118 silly packumentCache full:https://registry.npmjs.org/@types%2fnode set size:undefined disposed:false
+119 silly placeDep ROOT @types/node@25.6.0 OK for: @types/readable-stream@4.0.23 want: *
+120 silly fetch manifest undici-types@~7.19.0
+121 silly packumentCache full:https://registry.npmjs.org/undici-types cache-miss
+122 http fetch GET 200 https://registry.npmjs.org/undici-types 153ms (cache miss)
+123 silly packumentCache full:https://registry.npmjs.org/undici-types set size:undefined disposed:false
+124 silly placeDep ROOT undici-types@7.19.2 OK for: @types/node@25.6.0 want: ~7.19.0
+125 silly placeDep ROOT buffer@6.0.3 OK for: bl@6.1.6 want: ^6.0.3
+126 silly placeDep ROOT inherits@2.0.4 OK for: bl@6.1.6 want: ^2.0.4
+127 silly fetch manifest base64-js@^1.3.1
+128 silly packumentCache full:https://registry.npmjs.org/base64-js cache-miss
+129 silly fetch manifest ieee754@^1.2.1
+130 silly packumentCache full:https://registry.npmjs.org/ieee754 cache-miss
+131 http fetch GET 200 https://registry.npmjs.org/ieee754 612ms (cache miss)
+132 silly packumentCache full:https://registry.npmjs.org/ieee754 set size:undefined disposed:false
+133 http fetch GET 200 https://registry.npmjs.org/base64-js 1114ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/base64-js set size:undefined disposed:false
+135 silly placeDep ROOT base64-js@1.5.1 OK for: buffer@6.0.3 want: ^1.3.1
+136 silly placeDep ROOT ieee754@1.2.1 OK for: buffer@6.0.3 want: ^1.2.1
+137 silly placeDep ROOT ms@2.1.3 OK for: debug@4.4.3 want: ^2.1.3
+138 silly placeDep ROOT abort-controller@3.0.0 OK for: readable-stream@4.7.0 want: ^3.0.0
+139 silly placeDep ROOT events@3.3.0 OK for: readable-stream@4.7.0 want: ^3.3.0
+140 silly placeDep ROOT process@0.11.10 OK for: readable-stream@4.7.0 want: ^0.11.10
+141 silly placeDep ROOT string_decoder@1.3.0 OK for: readable-stream@4.7.0 want: ^1.3.0
+142 silly fetch manifest event-target-shim@^5.0.0
+143 silly packumentCache full:https://registry.npmjs.org/event-target-shim cache-miss
+144 silly fetch manifest safe-buffer@~5.2.0
+145 silly packumentCache full:https://registry.npmjs.org/safe-buffer cache-miss
+146 http fetch GET 200 https://registry.npmjs.org/safe-buffer 158ms (cache miss)
+147 silly packumentCache full:https://registry.npmjs.org/safe-buffer set size:undefined disposed:false
+148 http fetch GET 200 https://registry.npmjs.org/event-target-shim 162ms (cache miss)
+149 silly packumentCache full:https://registry.npmjs.org/event-target-shim set size:undefined disposed:false
+150 silly placeDep ROOT event-target-shim@5.0.1 OK for: abort-controller@3.0.0 want: ^5.0.0
+151 silly placeDep ROOT safe-buffer@5.2.1 OK for: string_decoder@1.3.0 want: ~5.2.0
+152 silly reify moves {}
+153 silly audit bulk request {
+153 silly audit   'node-red-contrib-coap': [ '0.9.0' ],
+153 silly audit   cbor: [ '10.0.12' ],
+153 silly audit   coap: [ '1.5.0' ],
+153 silly audit   'h5.linkformat': [ '0.0.0' ],
+153 silly audit   nofilter: [ '3.1.0' ],
+153 silly audit   '@types/readable-stream': [ '4.0.23' ],
+153 silly audit   bl: [ '6.1.6' ],
+153 silly audit   capitalize: [ '2.0.4' ],
+153 silly audit   'coap-packet': [ '1.1.1' ],
+153 silly audit   debug: [ '4.4.3' ],
+153 silly audit   fastseries: [ '2.0.0' ],
+153 silly audit   'lru-cache': [ '11.3.5' ],
+153 silly audit   'readable-stream': [ '4.7.0' ],
+153 silly audit   '@types/node': [ '25.6.0' ],
+153 silly audit   'undici-types': [ '7.19.2' ],
+153 silly audit   buffer: [ '6.0.3' ],
+153 silly audit   inherits: [ '2.0.4' ],
+153 silly audit   'base64-js': [ '1.5.1' ],
+153 silly audit   ieee754: [ '1.2.1' ],
+153 silly audit   ms: [ '2.1.3' ],
+153 silly audit   'abort-controller': [ '3.0.0' ],
+153 silly audit   events: [ '3.3.0' ],
+153 silly audit   process: [ '0.11.10' ],
+153 silly audit   string_decoder: [ '1.3.0' ],
+153 silly audit   'event-target-shim': [ '5.0.1' ],
+153 silly audit   'safe-buffer': [ '5.2.1' ]
+153 silly audit }
+154 silly tarball no local data for safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz. Extracting by manifest.
+155 silly tarball no local data for process@https://registry.npmjs.org/process/-/process-0.11.10.tgz. Extracting by manifest.
+156 silly tarball no local data for string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz. Extracting by manifest.
+157 silly tarball no local data for event-target-shim@https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz. Extracting by manifest.
+158 silly tarball no local data for events@https://registry.npmjs.org/events/-/events-3.3.0.tgz. Extracting by manifest.
+159 silly tarball no local data for abort-controller@https://registry.npmjs.org/abort-controller/-/abort-controller-3.0.0.tgz. Extracting by manifest.
+160 silly tarball no local data for ieee754@https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz. Extracting by manifest.
+161 silly tarball no local data for base64-js@https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz. Extracting by manifest.
+162 silly tarball no local data for buffer@https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz. Extracting by manifest.
+163 silly tarball no local data for inherits@https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz. Extracting by manifest.
+164 silly tarball no local data for undici-types@https://registry.npmjs.org/undici-types/-/undici-types-7.19.2.tgz. Extracting by manifest.
+165 silly tarball no local data for readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-4.7.0.tgz. Extracting by manifest.
+166 silly tarball no local data for bl@https://registry.npmjs.org/bl/-/bl-6.1.6.tgz. Extracting by manifest.
+167 silly tarball no local data for @types/node@https://registry.npmjs.org/@types/node/-/node-25.6.0.tgz. Extracting by manifest.
+168 silly tarball no local data for @types/readable-stream@https://registry.npmjs.org/@types/readable-stream/-/readable-stream-4.0.23.tgz. Extracting by manifest.
+169 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 361ms
+170 silly audit report {}
+171 http fetch GET 200 https://registry.npmjs.org/process/-/process-0.11.10.tgz 811ms (cache miss)
+172 http fetch GET 200 https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz 963ms (cache miss)
+173 http fetch GET 200 https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz 992ms (cache miss)
+174 http fetch GET 200 https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz 998ms (cache miss)
+175 http fetch GET 200 https://registry.npmjs.org/abort-controller/-/abort-controller-3.0.0.tgz 1056ms (cache miss)
+176 http fetch GET 200 https://registry.npmjs.org/events/-/events-3.3.0.tgz 1092ms (cache miss)
+177 http fetch GET 200 https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz 1111ms (cache miss)
+178 http fetch GET 200 https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz 1149ms (cache miss)
+179 http fetch GET 200 https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz 1454ms (cache miss)
+180 http fetch GET 200 https://registry.npmjs.org/bl/-/bl-6.1.6.tgz 1801ms (cache miss)
+181 http fetch GET 200 https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz 1814ms (cache miss)
+182 http fetch GET 200 https://registry.npmjs.org/@types/readable-stream/-/readable-stream-4.0.23.tgz 1999ms (cache miss)
+183 http fetch GET 200 https://registry.npmjs.org/readable-stream/-/readable-stream-4.7.0.tgz 4493ms (cache miss)
+184 http fetch GET 200 https://registry.npmjs.org/undici-types/-/undici-types-7.19.2.tgz 6205ms (cache miss)
+185 http fetch GET 200 https://registry.npmjs.org/@types/node/-/node-25.6.0.tgz 7648ms (cache miss)
+186 silly ADD node_modules/safe-buffer
+187 silly ADD node_modules/event-target-shim
+188 silly ADD node_modules/string_decoder
+189 silly ADD node_modules/process
+190 silly ADD node_modules/events
+191 silly ADD node_modules/abort-controller
+192 silly ADD node_modules/ms
+193 silly ADD node_modules/ieee754
+194 silly ADD node_modules/base64-js
+195 silly ADD node_modules/inherits
+196 silly ADD node_modules/buffer
+197 silly ADD node_modules/undici-types
+198 silly ADD node_modules/@types/node
+199 silly ADD node_modules/readable-stream
+200 silly ADD node_modules/lru-cache
+201 silly ADD node_modules/fastseries
+202 silly ADD node_modules/debug
+203 silly ADD node_modules/coap-packet
+204 silly ADD node_modules/capitalize
+205 silly ADD node_modules/bl
+206 silly ADD node_modules/@types/readable-stream
+207 silly ADD node_modules/nofilter
+208 silly ADD node_modules/h5.linkformat
+209 silly ADD node_modules/coap
+210 silly ADD node_modules/cbor
+211 silly ADD node_modules/node-red-contrib-coap
+212 verbose cwd /data
+213 verbose os Linux 6.6.87.2-microsoft-standard-WSL2
+214 verbose node v20.20.1
+215 verbose npm  v10.8.2
+216 verbose exit 0
+217 info ok

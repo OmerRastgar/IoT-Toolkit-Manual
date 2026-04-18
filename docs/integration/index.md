@@ -6,8 +6,10 @@ Combine all components into a complete working system.
 
 - Connect all sensors to ESP32
 - Display data locally on LCD/TFT
-- Transmit data to cloud via MQTT/HTTP
+- **Dual Connectivity**: Toggle between **Secure Mode** (certificate-based TLS for AWS IoT Core) and **Unsecure Mode** (for local server testing).
+- **Multi-Protocol Support**: Use **MQTT**, **HTTP**, or **CoAP** based on your project requirements.
 - Handle errors and edge cases
+
 
 ## System Architecture
 

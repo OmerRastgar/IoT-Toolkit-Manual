@@ -16,369 +16,210 @@ This code integrates:
 ## Required Libraries
 
 ```cpp
-#include <WiFi.h>
+#include "secrets.h"
 #include <Wire.h>
+#include <LiquidCrystal_PCF8574.h> 
+#include <I2Cdev.h>
+#include <MPU6050.h> 
+#include <WiFiManager.h>
+#include <WiFiClientSecure.h> 
+#include <WiFiClient.h>       
 #include <PubSubClient.h>
+#include <HTTPClient.h>
+#include <WiFiUdp.h>
+#include <coap-simple.h> 
 #include <ArduinoJson.h>
-#include <LiquidCrystal_I2C.h>
+#include <DHT.h>
+#include <SPI.h>
+#include <SD.h>
+#include <time.h> 
 
-// TODO: Add sensor-specific libraries
-```
+// ==========================================
+// *** MASTER CONFIGURATION ***
+// ==========================================
 
-## Configuration
-
-```cpp
-// ============== CONFIGURATION ==============
-
-// WiFi Settings
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
-
-// MQTT Settings
-const char* mqtt_server = "broker.hivemq.com";  // Change to your broker
-const int mqtt_port = 1883;
-const char* mqtt_client_id = "iot-toolkit-001";
-
-// Pin Definitions
-#define LCD_ADDRESS 0x27
-#define LCD_COLUMNS 16
-#define LCD_ROWS 2
-
-// Timing
-const unsigned long SENSOR_INTERVAL = 5000;   // Read sensors every 5s
-const unsigned long DISPLAY_INTERVAL = 1000;  // Update display every 1s
-const unsigned long MQTT_INTERVAL = 10000;    // Send MQTT every 10s
-
-// ============== GLOBAL VARIABLES ==============
-```
-
-## Complete Sketch
-
-```cpp
-/*
- * IoT Toolkit - Complete Integration
- * 
- * Features:
- * - Read all sensors (temperature, humidity, vibration, acoustic)
- * - Display on LCD
- * - Send data via MQTT
- * - WiFi connectivity with auto-reconnect
+/** 
+ * PROTOCOL_MODE: Select the communication protocol
+ * 0 = MQTT (Standard Pub/Sub)
+ * 1 = HTTP (RESTful POST)
+ * 2 = CoAP (UDP-based Constrained Application Protocol)
  */
+#define PROTOCOL_MODE 2 
 
-#include <WiFi.h>
-#include <Wire.h>
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
-#include <LiquidCrystal_I2C.h>
+/**
+ * USE_SECURITY: Toggle connection security
+ * 1 = SECURE MODE (SSL/TLS enabled)
+ *     Required for AWS IoT Core. Uses certificate-based mTLS.
+ * 0 = UNSECURE MODE (Plaintext communication)
+ *     Used for local Mosquitto, Node-RED, or local CoAP/HTTP servers.
+ */
+#define USE_SECURITY  0 
 
-// ============== CONFIGURATION ==============
+// Generic IP used for ALL local protocols (MQTT, HTTP, CoAP)
+const char* LOCAL_SERVER_IP = "192.168.100.4"; 
 
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+// --- CoAP STABILITY CONFIG ---
+const int COAP_PORT = 5685; // Default CoAP is 5683; used 5685 for local testing
+// ==========================================
 
-const char* mqtt_server = "broker.hivemq.com";
-const int mqtt_port = 1883;
+#define DHTPIN        14    
+#define DHTTYPE       DHT22 
+#define SD_CS         5
+#define RESET_PIN     0 
+#define LCD_ADDR      0x27  
+#define MPU_ADDR      0x68  
 
-// ============== GLOBAL OBJECTS ==============
+LiquidCrystal_PCF8574 lcd(LCD_ADDR);
+MPU6050 mpu(MPU_ADDR); 
 
-WiFiClient espClient;
-PubSubClient mqttClient(espClient);
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+// Networking Clients
+WiFiClient netLocal;
+WiFiClientSecure netSecure;
+PubSubClient client; 
+WiFiUDP udp;
+Coap coap(udp);
+DHT dht(DHTPIN, DHTTYPE);
+WiFiManager wm;
 
-// ============== GLOBAL VARIABLES ==============
+unsigned long lastMillis = 0;
+bool mpuAlive = false; 
 
-// Sensor data
-float temperature = 0.0;
-float humidity = 0.0;
-float vibration = 0.0;
-float acoustic = 0.0;
+// --- LCD HELPER ---
+void updateLCD(String l1, String l2) {
+  lcd.clear();
+  lcd.setCursor(0,0); lcd.print(l1);
+  lcd.setCursor(0,1); lcd.print(l2);
+}
 
-// Timestamps
-unsigned long lastSensorRead = 0;
-unsigned long lastDisplayUpdate = 0;
-unsigned long lastMQTTSend = 0;
+// --- SECURE TIME SYNC ---
+void syncTime() {
+  configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+  time_t now = time(nullptr);
+  while (now < 8 * 3600 * 2) { delay(500); now = time(nullptr); }
+  Serial.println("Time Synced!");
+}
 
-// System state
-bool wifiConnected = false;
-bool mqttConnected = false;
-int readCount = 0;
+// --- MQTT LOGIC ---
+void connectMQTT() {
+  if (client.connect(THINGNAME)) {
+    Serial.println("MQTT Connected");
+    updateLCD("MQTT Connected", USE_SECURITY ? "SECURE (AWS)" : "LOCAL (IP)");
+  } else {
+    Serial.printf("MQTT Fail, rc=%d\n", client.state());
+  }
+}
 
-// ============== SETUP ==============
+// --- HTTP LOGIC ---
+void publishHTTP(String payload) {
+  HTTPClient http;
+  String url;
+  
+  if (USE_SECURITY) {
+    url = "https://" + String(AWS_IOT_ENDPOINT) + ":8443/topics/esp32/pub?qos=1";
+    http.begin(netSecure, url);
+  } else {
+    url = "http://" + String(LOCAL_SERVER_IP) + ":1880/telemetry";
+    http.begin(netLocal, url);
+  }
+
+  int httpCode = http.POST(payload);
+  Serial.printf("HTTP Code: %d\n", httpCode);
+  http.end();
+}
+
+// --- CoAP LOGIC (Stabilized) ---
+// Note: We provide a callback to handle server responses (ACKs). 
+// This prevents the ESP32 from panicking if the server doesn't respond instantly.
+void coapResponseCallback(CoapPacket &packet, IPAddress ip, int port) {
+  Serial.print("CoAP Server ACK received! Status: ");
+  Serial.println(packet.code);
+}
+
+void publishCoAP(String payload) {
+  if (payload.length() == 0) return;
+
+  IPAddress serverIP;
+  if (serverIP.fromString(LOCAL_SERVER_IP)) {
+    Serial.printf("Sending CoAP to %s:%d\n", LOCAL_SERVER_IP, COAP_PORT);
+    // Use the explicit length to ensure a clean packet
+    uint16_t msgid = coap.put(serverIP, COAP_PORT, "telemetry", payload.c_str(), payload.length());
+    if (msgid > 0) Serial.println("CoAP Sent successfully.");
+  } else {
+    Serial.println("Invalid CoAP Server IP!");
+  }
+}
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("\n========================================");
-  Serial.println("IoT Toolkit - Complete Integration");
-  Serial.println("========================================\n");
+  Serial.begin(9600);
+  Wire.begin(21, 22);
+  lcd.begin(16, 2);
+  lcd.setBacklight(255);
   
-  // Initialize LCD
-  lcd.init();
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("IoT Toolkit");
-  lcd.setCursor(0, 1);
-  lcd.print("Starting...");
-  
-  // Initialize Wire (I2C)
-  Wire.begin();
-  Serial.println("I2C initialized");
-  
-  // TODO: Initialize sensors
-  // initializeSensors();
-  
-  // Connect WiFi
-  connectWiFi();
-  
-  // Setup MQTT
-  mqttClient.setServer(mqtt_server, mqtt_port);
-  mqttClient.setCallback(mqttCallback);
-  
-  Serial.println("\nSetup complete. Starting main loop...\n");
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Ready!");
-}
+  dht.begin();
+  mpu.initialize();
+  mpuAlive = mpu.testConnection();
+  SD.begin(SD_CS);
 
-// ============== MAIN LOOP ==============
+  if (!wm.autoConnect("CyberGaar_Node_AP")) { ESP.restart(); }
+
+  // Security Switch
+  if (USE_SECURITY && PROTOCOL_MODE < 2) {
+    syncTime();
+    netSecure.setCACert(AWS_CERT_CA);
+    netSecure.setCertificate(AWS_CERT_CRT);
+    netSecure.setPrivateKey(AWS_CERT_PRIVATE);
+    
+    client.setClient(netSecure);
+    client.setServer(AWS_IOT_ENDPOINT, 8883);
+  } else {
+    // Both Insecure MQTT and CoAP use this branch
+    client.setClient(netLocal);
+    client.setServer(LOCAL_SERVER_IP, 1883);
+  }
+
+  // Protocol specific startup
+  if (PROTOCOL_MODE == 0) {
+    connectMQTT();
+  } else if (PROTOCOL_MODE == 2) {
+    coap.response(coapResponseCallback);
+    coap.start();
+  }
+
+  updateLCD("CYBERGAAR NODE", USE_SECURITY ? "SECURE MODE" : "LOCAL MODE");
+}
 
 void loop() {
-  // Handle WiFi connection
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWiFi();
+  if (PROTOCOL_MODE == 0) {
+    if (!client.connected()) connectMQTT();
+    client.loop();
+  } else if (PROTOCOL_MODE == 2) {
+    coap.loop();
   }
-  
-  // Handle MQTT connection
-  if (!mqttClient.connected()) {
-    connectMQTT();
-  }
-  mqttClient.loop();
-  
-  // Read sensors periodically
-  if (millis() - lastSensorRead >= SENSOR_INTERVAL) {
-    readSensors();
-    lastSensorRead = millis();
-  }
-  
-  // Update display periodically
-  if (millis() - lastDisplayUpdate >= DISPLAY_INTERVAL) {
-    updateDisplay();
-    lastDisplayUpdate = millis();
-  }
-  
-  // Send MQTT data periodically
-  if (millis() - lastMQTTSend >= MQTT_INTERVAL) {
-    sendMQTTData();
-    lastMQTTSend = millis();
-  }
-}
 
-// ============== WIFI FUNCTIONS ==============
+  if (millis() - lastMillis > 5000) {
+    lastMillis = millis();
 
-void connectWiFi() {
-  if (WiFi.status() == WL_CONNECTED) return;
-  
-  Serial.print("Connecting to WiFi");
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("WiFi...");
-  
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nWiFi connected!");
-    Serial.print("IP: ");
-    Serial.println(WiFi.localIP());
-    wifiConnected = true;
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+    int16_t ax, ay, az;
+    float accelX = 0;
+    if (mpuAlive) { mpu.getAcceleration(&ax, &ay, &az); accelX = ax / 16384.0; }
+
+    StaticJsonDocument<256> doc;
+    doc["t"] = t; doc["h"] = h; doc["ax"] = accelX;
     
+    char buffer[256];
+    serializeJson(doc, buffer);
+
+    if (PROTOCOL_MODE == 0) client.publish("esp32/pub", buffer);
+    else if (PROTOCOL_MODE == 1) publishHTTP(String(buffer));
+    else if (PROTOCOL_MODE == 2) publishCoAP(String(buffer));
+
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("WiFi OK");
-    lcd.setCursor(0, 1);
-    lcd.print(WiFi.localIP().toString().substring(0, 14));
-    delay(2000);
-  } else {
-    Serial.println("\nWiFi connection failed!");
-    wifiConnected = false;
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("WiFi Failed!");
-    delay(2000);
+    lcd.setCursor(0,0); lcd.printf("T:%.1f H:%.0f", t, h);
+    lcd.setCursor(0,1); lcd.printf("%s P:%d", USE_SECURITY ? "SEC" : "LOC", PROTOCOL_MODE);
   }
 }
-
-// ============== MQTT FUNCTIONS ==============
-
-void connectMQTT() {
-  while (!mqttClient.connected()) {
-    Serial.print("MQTT connecting...");
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("MQTT...");
-    
-    String clientId = String(mqtt_client_id) + "-" + String(random(0xffff), HEX);
-    
-    if (mqttClient.connect(clientId.c_str())) {
-      Serial.println("connected");
-      mqttConnected = true;
-      
-      // Subscribe to command topic
-      mqttClient.subscribe("iot-toolkit/commands");
-      
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("MQTT OK");
-      delay(1000);
-    } else {
-      Serial.print("failed, rc=");
-      Serial.println(mqttClient.state());
-      mqttConnected = false;
-      
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("MQTT Failed!");
-      delay(2000);
-    }
-  }
-}
-
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("MQTT message [");
-  Serial.print(topic);
-  Serial.print("]: ");
-  
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
-  
-  // TODO: Handle commands
-}
-
-void sendMQTTData() {
-  if (!mqttClient.connected()) {
-    Serial.println("MQTT not connected, skipping send");
-    return;
-  }
-  
-  StaticJsonDocument<512> doc;
-  
-  doc["device_id"] = mqtt_client_id;
-  doc["timestamp"] = millis();
-  doc["readings"] = readCount;
-  
-  JsonObject sensors = doc.createNestedObject("sensors");
-  sensors["temperature"] = temperature;
-  sensors["humidity"] = humidity;
-  sensors["vibration"] = vibration;
-  sensors["acoustic"] = acoustic;
-  
-  JsonObject system = doc.createNestedObject("system");
-  system["wifi_rssi"] = WiFi.RSSI();
-  system["free_heap"] = ESP.getFreeHeap();
-  
-  char payload[512];
-  size_t len = serializeJson(doc, payload);
-  
-  Serial.print("Sending MQTT: ");
-  Serial.println(payload);
-  
-  bool published = mqttClient.publish("iot-toolkit/data", payload);
-  
-  if (published) {
-    Serial.println("MQTT publish successful");
-  } else {
-    Serial.println("MQTT publish failed");
-  }
-}
-
-// ============== SENSOR FUNCTIONS ==============
-
-void readSensors() {
-  Serial.println("Reading sensors...");
-  
-  // TODO: Add actual sensor reading code
-  // These are placeholder values - replace with real sensor readings
-  
-  temperature = 25.0 + random(-10, 10) / 10.0;  // 20.0 - 30.0
-  humidity = 50.0 + random(-20, 20);             // 30 - 70
-  vibration = random(0, 100);                     // 0 - 100
-  acoustic = random(30, 90);                     // 30 - 90 dB
-  
-  readCount++;
-  
-  Serial.print("Temp: ");
-  Serial.print(temperature);
-  Serial.print("C, Hum: ");
-  Serial.print(humidity);
-  Serial.print("%, Vib: ");
-  Serial.print(vibration);
-  Serial.print", Acoustic: ");
-  Serial.print(acoustic);
-  Serial.println("dB");
-}
-
-// ============== DISPLAY FUNCTIONS ==============
-
-void updateDisplay() {
-  // Alternate between different display modes
-  static int displayMode = 0;
-  
-  lcd.clear();
-  
-  switch (displayMode) {
-    case 0:
-      // Show temperature and humidity
-      lcd.setCursor(0, 0);
-      lcd.print("T:");
-      lcd.print(temperature, 1);
-      lcd.print((char)223); // Degree symbol
-      lcd.print("C");
-      
-      lcd.setCursor(0, 1);
-      lcd.print("H:");
-      lcd.print(humidity, 0);
-      lcd.print("%");
-      break;
-      
-    case 1:
-      // Show vibration and acoustic
-      lcd.setCursor(0, 0);
-      lcd.print("Vib:");
-      lcd.print(vibration, 0);
-      
-      lcd.setCursor(0, 1);
-      lcd.print("Snd:");
-      lcd.print(acoustic, 0);
-      lcd.print("dB");
-      break;
-      
-    case 2:
-      // Show WiFi and system status
-      lcd.setCursor(0, 0);
-      lcd.print("WiFi:");
-      lcd.print(WiFi.RSSI());
-      lcd.print("dBm");
-      
-      lcd.setCursor(0, 1);
-      lcd.print("Reads:");
-      lcd.print(readCount);
-      break;
-  }
-  
-  displayMode = (displayMode + 1) % 3;  // Cycle through 3 modes
-}
-
-// ============== UTILITY FUNCTIONS ==============
-
-// TODO: Add any utility functions
 ```
 
 ## Code Structure

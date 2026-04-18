@@ -1,89 +1,74 @@
-# Voice Module
+# Voice Recognition Module
 
-<!-- TODO: Extract all content from Copy of IoT Kit - Tehqiq.md -->
+The toolkit uses an advanced **Voice Recognition Module** (e.g., Elechouse V3) for audio recognition and refined command control. This module can be trained to recognize custom voice commands.
 
-## Overview
+![Voice Recognition Module](../../assets/images/toolkit/Voice Recognition Module.webp)
 
-Voice module for audio output, alerts, and voice feedback.
+!!! warning "Voltage Level Shifting"
+    The Voice Recognition Module typically operates at **5V**, but the ESP32 GPIO pins are **3.3V**. You **must** use a voltage divider (resistors) or a level shifter on the module's TX pin before connecting it to the ESP32 RX pin to avoid damaging your board.
 
 ## Specifications
 
 | Parameter | Value |
 |-----------|-------|
-| Model | <!-- TODO: Add --> |
-| Interface | I2C or UART |
-| Operating Voltage | 3.3V or 5V |
-| Audio Output | Speaker or headphone jack |
-| Storage | <!-- TODO: Add --> |
+| Model | Elechouse Voice Recognition V3 |
+| Interface | UART (Serial) |
+| Voltage | 4.5V - 5.5V |
+| Recognition | Up to 80 commands (7 active) |
+| Accuracy | >90% (trained) |
 
 ## Pinout
 
 | Pin | Function | ESP32 Connection |
 |-----|----------|-----------------|
-| VCC | Power | 3.3V or 5V |
+| VCC | Power | 5V / VIN |
 | GND | Ground | GND |
-| SDA | I2C Data | GPIO21 |
-| SCL | I2C Clock | GPIO22 |
-| or TX/RX | UART | GPIO TX/RX pins |
-
-## Wiring Diagram
-
-```
-Voice Module       ESP32
-------------       -----
-VCC          -->   3.3V/5V
-GND          -->   GND
-SDA          -->   GPIO21 (I2C)
-SCL          -->   GPIO22 (I2C)
-or
-TX           -->   GPIO RX
-RX           -->   GPIO TX
-```
-
-## Required Libraries
-
-<!-- TODO: Add library names from source -->
+| TX | Data Output | RX2 (GPIO16) *via Level Shifter* |
+| RX | Data Input | TX2 (GPIO17) |
 
 ## Code Example
 
-<!-- TODO: Extract code from source file -->
-
 ```cpp
-// Voice Module Test Code
-// TODO: Add actual code from source file
+// Voice Recognition Module UART Test
+#include <SoftwareSerial.h>
+#include "VoiceRecognitionV3.h"
 
-#include <Wire.h>
+/**
+  Connection:
+  ESP32 RX2 (GPIO16) <--- Level Shifter <--- Module TX
+  ESP32 TX2 (GPIO17) ---> Module RX
+*/
+
+VR myVR(16, 17);    // RX, TX
 
 void setup() {
   Serial.begin(115200);
-  Wire.begin();
+  myVR.begin(9600);
   
-  // TODO: Add module initialization
+  if(myVR.clear() == 0){
+    Serial.println("VR Module Cleared.");
+  }else{
+    Serial.println("VR Module not found.");
+  }
 }
 
 void loop() {
-  // TODO: Add voice playback code
-  
-  delay(5000);
+  int ret = myVR.recognize(buf, 50);
+  if(ret>0){
+    Serial.print("Recognized: ");
+    Serial.println(ret);
+  }
 }
 ```
-
-## Testing
-
-### Verification Steps
-
-1. Connect speaker or headphones
-2. Upload test code
-3. Verify audio output
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| No audio output | Check volume, verify speaker connection |
-| Distorted sound | Check power supply, verify audio file format |
-| <!-- TODO: Add --> | <!-- TODO: Add --> |
+| Module not found | Check UART pins, verify 5V power supply |
+| No command recognized | Ensure commands are trained, check ambient noise |
+| ESP32 crashes | Verify voltage level shifter on TX pin |
 
 ## Next Steps
 
-- Add audio alerts to [integration](../../integration/index.md)
+- Integrate with [Integration Overview](../../integration/index.md)

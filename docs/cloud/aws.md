@@ -77,45 +77,19 @@ Download all files:
 !!! important "Keep Private Key Secure"
     The private key should never be shared or committed to public repositories.
 
-## Step 4: Configure ESP32
+## Step 4: Choose Your Protocol
 
-### 4.1 Upload Certificates
+AWS IoT Core supports multiple protocols. Choose the one that best fits your application needs.
 
-Convert certificates to Arduino strings:
+### Option A: MQTT (Native & Recommended)
 
-1. Open each certificate file in text editor
-2. Copy entire content (including BEGIN/END lines)
-3. Create Arduino sketch with certificates:
+MQTT is the standard for IoT due to its lightweight nature and bidirectional communication.
 
-```cpp
-// certificates.h
-#ifndef CERTIFICATES_H
-#define CERTIFICATES_H
+#### 1. Upload Certificates
+Follow the instructions in the [Certificates Management section](certificates.md) to add your `.pem` and `.key` files to your project.
 
-const char* ca_cert = R"EOF(
------BEGIN CERTIFICATE-----
-[Amazon Root CA 1 certificate content]
------END CERTIFICATE-----
-)EOF";
-
-const char* client_cert = R"EOF(
------BEGIN CERTIFICATE-----
-[Your device certificate content]
------END CERTIFICATE-----
-)EOF";
-
-const char* private_key = R"EOF(
------BEGIN RSA PRIVATE KEY-----
-[Your private key content]
------END RSA PRIVATE KEY-----
-)EOF";
-
-#endif
-```
-
-### 4.2 Update ESP32 Code
-
-Modify the integration code:
+#### 2. ESP32 MQTT Code
+Modify the integration code to connect via port 8883 (MQTT over TLS):
 
 ```cpp
 #include <WiFiClientSecure.h>
@@ -136,28 +110,18 @@ PubSubClient client(wifiClient);
 
 void setup() {
   Serial.begin(115200);
-  
-  // Configure TLS
   wifiClient.setCACert(ca_cert);
   wifiClient.setCertificate(client_cert);
   wifiClient.setPrivateKey(private_key);
   
-  // Connect WiFi
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nWiFi connected");
-  
-  // Setup MQTT
+  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
   client.setServer(mqtt_server, mqtt_port);
 }
 
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Connecting to AWS IoT...");
-    
     if (client.connect(mqtt_client_id)) {
       Serial.println("connected");
     } else {
@@ -169,26 +133,54 @@ void reconnect() {
 }
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
+  if (!client.connected()) reconnect();
   client.loop();
-  
-  // Publish sensor data
+  // Publish sensor data every 10 seconds
   static unsigned long lastMsg = 0;
   if (millis() - lastMsg > 10000) {
     lastMsg = millis();
-    
-    String payload = "{\"temperature\":25.5,\"humidity\":60.0}";
-    client.publish("iot-toolkit/data", payload.c_str());
-    Serial.println("Published to AWS IoT");
+    client.publish("iot-toolkit/data", "{\"temperature\":25.5}");
   }
 }
 ```
 
+
+!!! info "Reference"
+    For a detailed step-by-step on MQTT connection, see the [How2Electronics Guide](https://how2electronics.com/connecting-esp32-to-amazon-aws-iot-core-using-mqtt/).
+
+---
+
+### Option B: HTTPS (Native)
+
+HTTPS is useful for one-way data publishing (RESTful API). It uses the same certificates for Mutual TLS (mTLS).
+
+- **Port**: 443
+- **Endpoint**: `https://<YOUR_ENDPOINT>/topics/<TOPIC_NAME>?qos=1`
+- **Method**: `POST`
+
+Instructions for HTTPS publish:
+1. Ensure your IoT Policy allows `iot:Publish`.
+2. Use `WiFiClientSecure` with your certificates.
+3. Send a POST request with the JSON payload.
+
+---
+
+### Option C: CoAP (via DTLS Server)
+
+AWS IoT Core **does not natively support CoAP**. To use CoAP on AWS, you must host a custom server that acts as a gateway.
+
+- **Solution**: Use the [CoAP-DTLS-Server](https://github.com/basilk15/CoAP-DTLS-Server) repository.
+- **Requirement**: This server must be hosted on an AWS EC2 instance or Fargate container.
+- **Security**: DTLS (Datagram Transport Layer Security) is required to maintain the same level of security as MQTT/HTTPS.
+
+1. Deploy the CoAP-DTLS server on an EC2 instance.
+2. Open UDP port 5684 in your Security Group.
+3. Configure the ESP32 to send CoAP messages to the EC2 public IP.
+
+
 ### 4.3 Get AWS IoT Endpoint
 
-1. In AWS IoT Core, go to **Settings**
+1. In AWS IoT Core, go to **MQTT Test Client**
 2. Copy the **Endpoint** address
 3. Replace `xxxxxxxxxxxxxx-ats.iot.us-east-1.amazonaws.com` in code
 

@@ -7,8 +7,8 @@ services:
     restart: always
     ports:
       - "1883:1883"   # MQTT Port (Non-TLS)
-      - "8883:8883"   # MQTT Port (Secure TLS)
-      - "9001:9001"   # MQTT over WebSockets
+      - "18883:8883"  # MQTT Port (Secure TLS)
+      - "19001:9001"  # MQTT over WebSockets
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./mosquitto/data:/mosquitto/data
@@ -21,8 +21,14 @@ services:
     restart: always
     ports:
       - "1880:1880"   # Node-RED UI + HTTP API
-      - "5683:5683/udp" # CoAP Port
+      - "5685:5683/udp" # CoAP Port (Moved to 5685 to avoid conflicts)
+    environment:
+      - NODE_RED_CREDENTIAL_SECRET=iottoolkitsecret123
+      - INFLUX_TOKEN=iotmastertoken1234567890
+      - INFLUX_ORG=iot-toolkit
+      - INFLUX_BUCKET=sensor_data
     volumes:
+
       - ./node-red/data:/data
     depends_on:
       - mosquitto
@@ -34,12 +40,17 @@ services:
     ports:
       - "8086:8086"   # InfluxDB UI/API
     volumes:
-      - ./influxdb/data:/var/lib/influxdb2
-      - ./influxdb/config:/etc/influxdb2
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
       - DOCKER_INFLUXDB_INIT_PASSWORD=iotpassword123
       - DOCKER_INFLUXDB_INIT_ORG=iot-toolkit
       - DOCKER_INFLUXDB_INIT_BUCKET=sensor_data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=iotmastertoken1234567890
       - DOCKER_INFLUXDB_INIT_RETENTION=1w
+
+volumes:
+  influxdb_data:
+  influxdb_config:

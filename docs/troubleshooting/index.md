@@ -35,9 +35,34 @@ void loop() {
 
 ### Hardware Issues
 - [Sensor not detected](hardware-issues.md)
-- [Display blank](hardware-issues.md)
-- [WiFi won't connect](hardware-issues.md)
-- [Brownout errors](hardware-issues.md)
+- [WiFi Connection Problems](#wifi-connection-problems)
+- [MQTT Connection Issues](#mqtt-broker-issues)
+- [InfluxDB & Authentication Errors](#influxdb-authentication-errors)
+- [ESP32 Stability (CoAP/Crashes)](#esp32-stability-crashes)
+- [Hardware Errors](#hardware-errors)
+
+## InfluxDB & Authentication Errors
+
+### "Failed to load keys" in InfluxDB UI
+- **Cause**: This happens if you have wiped the database but your browser is still using an old session cookie. 
+- **Solution**: Logout of the InfluxDB UI and log back in, or open the page in an **Incognito/Private window**.
+
+### "Unauthorized access" in Node-RED
+- **Cause**: On Windows, the internal database (BoltDB) can get "locked" by the host filesystem, preventing tokens from working correctly.
+- **Solution**: Ensure your `docker-compose.yml` uses **Named Volumes** (e.g., `influxdb_data`) instead of folder bind-mounts. Wiping the internal volumes via `docker volume rm` is sometimes required for a clean reset.
+
+### "Unable to create token"
+- **Cause**: Filesystem permissions or corruption in the InfluxDB config volume.
+- **Solution**: Follow the **Zero-Touch Docker Setup** in the [Self-Hosted Guide](../cloud/self-hosted.md) to ensure a clean, automated initialization.
+
+## ESP32 Stability (CoAP/Crashes)
+
+### ESP32 reboots or panics during CoAP
+- **Cause**: Using CoAP `PUT` or `POST` without a registered response callback. The device "waits" for an ACK and may overflow if the server responds unexpectedly.
+- **Solution**: 
+    1. Register a `coap.response(coapResponseCallback)` in your `setup()`.
+    2. Ensure the callback is valid (even if it just prints a message).
+    3. Verify the CoAP server port is moved to `5685` if using Docker on Windows.
 
 ### Software Issues
 - [Code won't compile](software-issues.md)

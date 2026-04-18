@@ -32,29 +32,27 @@ Libraries required for the IoT Toolkit.
 
 <!-- TODO: Extract specific libraries from source file -->
 
-### Temperature Sensor
+### DHT Sensor (Temp/Humidity)
 ```cpp
-// TODO: Add library name
-#include <???.h>
+#include "DHT.h"
 ```
 - **Install**: Arduino Library Manager
-- **Search**: <!-- TODO: Add -->
+- **Search**: "DHT sensor library" (by Adafruit)
+- **Dependency**: Also install "Adafruit Unified Sensor" if prompted.
 
-### Humidity Sensor
-```cpp
-// TODO: Add library name
-#include <???.h>
-```
-- **Install**: Arduino Library Manager
-- **Search**: <!-- TODO: Add -->
 
 ### Vibration/Accelerometer
 ```cpp
-// TODO: Add library name
-#include <???.h>
+// For MPU6050 (Recommended)
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+
+// For ADXL335 (Analog)
+// No specific library required; use analogRead().
 ```
 - **Install**: Arduino Library Manager
-- **Search**: <!-- TODO: Add -->
+- **Search**: "Adafruit MPU6050"
+
 
 ### Acoustic Sensor
 ```cpp

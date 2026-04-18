@@ -1,31 +1,33 @@
+<div align="center">
+  <img src="assets/images/toolkit/habib-university-logo.png" width="300">
+</div>
+
 # IoT Toolkit Manual
+
+
+
+![IoT Architecture](assets/images/toolkit/iot-architecture-new.png)
+
 
 A student-friendly guide for building and configuring IoT systems with ESP32, sensors, displays, and cloud connectivity.
 
-> [!TIP]
-> **Jump to the Full System**
-> If you have all your hardware components connected and just want the firmware to get started, go directly to the [**Complete Integration Code**](integration/complete-code.md).
+!!! tip "Jump to the Full System"
+    If you have all your hardware components connected and just want the firmware to get started, go directly to the [**Complete Integration Code**](integration/complete-code.md).
+
 
 ## What You'll Learn
 
 This guide will walk you through:
 
-- **Hardware Assembly**: Connect ESP32 with temperature, humidity, vibration, and acoustic sensors
-- **Display Integration**: Set up LCD and TFT displays for data visualization
-- **Module Configuration**: Configure I2C multiplexer, voice module, and camera module
-- **Communication**: Use WiFi with MQTT, HTTP, and CoAP protocols
-- **Cloud Deployment**: Connect to AWS IoT Core or set up your own server
-- **Troubleshooting**: Solve common hardware and software issues
+- **[Hardware Assembly](getting-started/assembly-guide.md)**: Connect ESP32 with temperature, humidity, vibration, and acoustic sensors
+- **[Display Integration](hardware/displays/index.md)**: Set up LCD and TFT displays for data visualization
+- **[Module Configuration](hardware/modules/index.md)**: Configure I2C multiplexer, voice module, and camera module
+- **[Communication](hardware/communication/index.md)**: Use WiFi with MQTT, HTTP, and CoAP protocols
+- **[Cloud Deployment](cloud/index.md)**: Connect to AWS IoT Core or set up your own server
+- **[Troubleshooting](troubleshooting/index.md)**: Solve common hardware and software issues
 
-## Quick Start
+## Core Components
 
-New to the IoT Toolkit? Start here:
-
-[Getting Started](getting-started/index.md){ .md-button .md-button--primary }
-
-## Hardware Components
-
-### Core Components
 - **ESP32**: WiFi-enabled microcontroller
 - **Sensors**: Temperature, Humidity, Vibration, Acoustic
 - **Displays**: LCD and TFT for local data display
@@ -59,27 +61,8 @@ Choose your preferred cloud deployment method:
 
 </div>
 
-## Documentation Structure
-
-### Getting Started
-Everything you need to begin: prerequisites, hardware list, and assembly guide.
-
-### Hardware
-Detailed documentation for each component: ESP32, sensors, displays, and modules.
-
-### Software
-Firmware setup, required libraries, and code examples.
-
-### Integration
-Complete system integration with combined code and testing procedures.
-
-### Cloud
-Step-by-step guides for AWS IoT Core and self-hosted deployment.
-
-### Troubleshooting
-Common issues and solutions for hardware and software problems.
-
 ## Need Help?
+
 
 - Check the [Troubleshooting](troubleshooting/index.md) section
 - Review the [Glossary](resources/glossary.md) for terms and definitions

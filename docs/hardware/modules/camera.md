@@ -1,5 +1,8 @@
 # Camera Module
 
+![ESP32-CAM](../../assets/images/toolkit/ESP32-CAM.webp)
+
+
 <!-- TODO: Extract all content from Copy of IoT Kit - Tehqiq.md -->
 
 ## Overview

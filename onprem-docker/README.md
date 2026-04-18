@@ -7,6 +7,7 @@ This folder contains a pre-configured Docker stack for IoT development, includin
 1.  **Mosquitto (MQTT)**: Port `1883` (Default) and `9001` (WebSockets).
 2.  **Node-RED**: Port `1880`. Used for automation and dashboards.
 3.  **InfluxDB**: Port `8086`. Used for data storage and visualization.
+4.  **CoAP Server**: Port `5683`. Dedicated reference server for CoAP plugtests.
 
 ## Quick Start
 
@@ -215,11 +216,12 @@ void loop() {
 ### Method D: CoAP Server (UDP)
 CoAP is a specialized web transfer protocol for use with constrained nodes and constrained networks.
 
+- **Reference Server**: The stack includes a dedicated **Eclipse Californium** server for CoAP testing.
 - **Port**: `5683` (UDP)
-- **Node-RED Setup**: 
-    1. Go to **Manage Palette** -> **Install**.
-    2. Search and install `node-red-contrib-coap`.
-    3. Use a `coap in` node listening on port `5683`.
+- **Node-RED Interaction**: 
+    1. Go to **Manage Palette** -> **Install** and search for `node-red-contrib-coap`.
+    2. Use a `coap request` node to interact with the dedicated `coap-server`.
+    3. Use it to bridge data from the CoAP server into **InfluxDB**.
 - **ESP32 Code**:
 ```cpp
 #include <WiFi.h>

@@ -2,192 +2,74 @@
 
 Set up your own MQTT broker, database, and dashboard.
 
-## Architecture
-
-```
-┌─────────────┐
-│   ESP32     │──WiFi──┐
-└─────────────┘        │
-                       ▼
-              ┌─────────────────┐
-              │  MQTT Broker    │
-              │  (Mosquitto)    │
-              │  Port 1883/8883 │
-              └────────┬────────┘
-                       │
-         ┌─────────────┼─────────────┐
-         ▼             ▼             ▼
-    ┌────────┐   ┌────────┐   ┌──────────┐
-    │InfluxDB│   │PostgreSQL│   │ Grafana  │
-    │(TSDB)  │   │(Relational)│   │Dashboard │
-    └────────┘   └────────┘   └──────────┘
-```
-
-## Option A: Raspberry Pi Setup
-
-### Hardware Requirements
-- Raspberry Pi 4 (2GB+ RAM recommended)
-- MicroSD card (32GB+)
-- Power supply
-- Ethernet connection (recommended)
-
-### Step 1: Install Raspberry Pi OS
-
-1. Download [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
-2. Flash Raspberry Pi OS Lite (64-bit)
-3. Boot and configure:
-   ```bash
-   sudo raspi-config
-   # Enable SSH
-   # Set hostname: iot-server
-   ```
-
-### Step 2: Install Mosquitto MQTT Broker
-
-```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install Mosquitto
-sudo apt install -y mosquitto mosquitto-clients
-
-# Enable and start service
-sudo systemctl enable mosquitto
-sudo systemctl start mosquitto
-
-# Test installation
-mosquitto_pub -t test -m "Hello MQTT"
-mosquitto_sub -t test
-```
-
-### Step 3: Configure Mosquitto
-
-Create configuration file:
-
-```bash
-sudo nano /etc/mosquitto/mosquitto.conf
-```
-
-Add configuration:
-
-```
-# Basic settings
-listener 1883
-protocol mqtt
-
-# Persistence
-persistence true
-persistence_location /var/lib/mosquitto/
-
-# Logging
-log_dest file /var/log/mosquitto/mosquitto.log
-log_type error
-log_type warning
-log_type information
-
-# Security (basic)
-allow_anonymous true  # Change to false for production
-
-# For TLS (optional)
-# listener 8883
-# certfile /etc/mosquitto/certs/server.crt
-# keyfile /etc/mosquitto/certs/server.key
-# cafile /etc/mosquitto/certs/ca.crt
-```
-
-Restart Mosquitto:
-```bash
-sudo systemctl restart mosquitto
-```
-
-### Step 4: Install InfluxDB (Time Series Database)
-
-```bash
-# Add InfluxDB repository
-curl -sL https://repos.influxdata.com/influxdb.key | gpg --dearmor | sudo tee /usr/share/keyrings/influxdb-archive-keyring.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/influxdb-archive-keyring.gpg] https://repos.influxdata.com/debian stable main" | sudo tee /etc/apt/sources.list.d/influxdb.list
-
-# Install
-sudo apt update
-sudo apt install -y influxdb2
-
-# Start service
-sudo systemctl enable influxdb
-sudo systemctl start influxdb
-```
-
-Access InfluxDB web UI at `http://raspberry-pi-ip:8086`
-
-### Step 5: Install Grafana
-
-```bash
-# Add Grafana repository
-curl -sL https://packages.grafana.com/gpg.key | sudo apt-key add -
-echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
-
-# Install
-sudo apt update
-sudo apt install -y grafana
-
-# Start service
-sudo systemctl enable grafana-server
-sudo systemctl start grafana-server
-```
-
-Access Grafana at `http://raspberry-pi-ip:3000`
-- Default login: admin/admin
-
-## Option B: Cloud VM Setup
-
-Use a cloud provider (AWS, GCP, Azure, DigitalOcean) for always-online server.
-
-### Recommended: DigitalOcean Droplet
-
-1. Create Ubuntu 22.04 droplet ($5/month)
-2. SSH into server
-3. Follow Raspberry Pi steps above
-
-### Option C: System Topology
+### Architecture
 
 The on-premise stack follows a centralized "Data Integration Hub" pattern, where Node-RED serves as the primary normalization layer for all incoming IoT data.
 
-![System Architecture](../assets/images/toolkit/architecture.png)
+```
+┌─────────────┐
+│   ESP32     │──WiFi/UDP──┐
+└─────────────┘            │ (CoAP/MQTT/HTTP)
+                           ▼
+                  ┌─────────────────┐
+                  │  Docker Host    │
+                  │  (Your Laptop)  │
+                  └────────┬────────┘
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+        ┌────────┐   ┌────────┐   ┌──────────┐
+        │Node-RED│   │InfluxDB│   │Mosquitto │
+        │(Logic) │   │(TSDB)  │   │(Broker)  │
+        └────────┘   └────────┘   └──────────┘
+```
 
-This architecture allows you to test multiple protocols (MQTT, HTTP, CoAP) simultaneously and route them all into a single InfluxDB temporal database.
+## Infrastructure Setup (Docker)
 
-### Pre-Configured Infrastructure
+This is the fastest and most stable way to get your environment running. We have provided a pre-configured **IoT Toolkit Stack** that handles authentication and database setup automatically.
 
-For a fast and robust setup, we have provided a pre-configured Docker environment in the repo. This includes a synchronized MQTT Broker, Node-RED engine, and InfluxDB database.
+### 📋 Prerequisites
+- **Docker Desktop** installed on Windows or Mac.
+- **Git** to clone the repository.
 
-### 📁 Stack Location
-Everything you need is located in the root of this repository:
+### Step 1: Navigate to the Stack
+Everything you need is located in the root of the repository:
 [**onprem-docker/**](../../onprem-docker/)
 
-### 📊 Supported Communication Methods
-This stack is designed to handle multiple IoT protocols simultaneously, making it ideal for testing different ESP32 configurations:
+### Step 2: Launch the Infrastructure
+Open your terminal in the `onprem-docker` folder and run:
+```bash
+docker-compose up -d
+```
 
-| Method | Protocol | Port | Description |
-| :--- | :--- | :--- | :--- |
-| **MQTT (Local)** | MQTT | `1883` | Standard, non-encrypted communication for local labs. |
-| **MQTT (Secure)** | MQTT/SSL | `8883` | Encrypted communication for VPS/Cloud deployments. |
-| **HTTP REST** | HTTP | `1880` | Use Node-RED as a web server to receive POST data. |
-| **CoAP** | CoAP/UDP | `5683` | Low-power, UDP-based transfers for constrained devices. |
+> [!SUCCESS]
+> **Zero-Touch Success!** The system will automatically create the database, set the admin password, and sync the security tokens between Node-RED and InfluxDB. You don't have to touch any configuration menus.
 
-### 🚀 Launch Instructions
+### 📊 Accessing Your Tools
 
-1.  Navigate to the `onprem-docker/` folder.
-2.  Start the services:
-    ```bash
-    docker-compose up -d
-    ```
-3.  Access the dashboards:
-    - **Node-RED**: [http://localhost:1880](http://localhost:1880) (Central Logic Hub)
-    - **InfluxDB**: [http://localhost:8086](http://localhost:8086) (Time-Series Data)
+![Node-RED Access](../assets/images/toolkit/node red.jpeg)
 
-### 🔐 Security for VPS
-If you are deploying this on a VPS, use the provided certificate generator:
-1.  Run `.\generate_certs.ps1` (Windows) inside the `onprem-docker` folder.
-2.  Enable the secure listener in `mosquitto/config/mosquitto.conf`.
+| Tool | URL | Credentials |
+| :--- | :--- | :--- |
+| **Node-RED** | [http://localhost:1880](http://localhost:1880) | (None required) |
+| **InfluxDB** | [http://localhost:8086](http://localhost:8086) | `admin` / `iotpassword123` |
+| **MQTT Broker** | `localhost:1883` | (Anonymous allowed) |
+
+
+### 🔐 Stability & Portability Secrets
+Our stack uses two professional techniques to ensure it works on every student's machine:
+
+1.  **Named Volumes**: We use `influxdb_data` (internal Linux volumes) instead of Windows folders. This prevents "Unauthorized" errors caused by Windows filesystem locking.
+2.  **Environment Sync**: The Master Token (`iotmastertoken1234567890`) and `CREDENTIAL_SECRET` are shared across all containers automatically.
+
+### 📁 Standardized Topic Structure
+To keep your data organized, use this "Flat Measurement" pattern:
+
+```
+esp32/pub  -->  { "t": 25.5, "h": 60 }  --> InfluxDB (measurement: esp32_metrics)
+```
+
+---
 
 ---
 
@@ -225,7 +107,10 @@ iot-toolkit/
 
 ## Data Pipeline
 
+![InfluxDB Dashboard](../assets/images/toolkit/fluxDB.jpeg)
+
 ### Bridge MQTT to InfluxDB
+
 
 Option 1: Telegraf
 ```bash

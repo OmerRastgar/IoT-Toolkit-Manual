@@ -1,5 +1,8 @@
 # TFT Display
 
+![TFT Display](../../assets/images/toolkit/esp32_4.3inch_hmi_display.png)
+
+
 <!-- TODO: Extract all content from Copy of IoT Kit - Tehqiq.md -->
 
 ## Overview

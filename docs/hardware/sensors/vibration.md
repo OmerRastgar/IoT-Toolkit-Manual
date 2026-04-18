@@ -4,18 +4,24 @@
 
 ## Overview
 
-<!-- TODO: Add description from source file -->
+Vibration is detected using either an **ADXL335** (analog) or **MPU6050** (I2C) accelerometer. The toolkit measures rapid changes in acceleration to identify vibration events.
 
-## Specifications
+![Vibration Sensor](../../assets/images/toolkit/adxl-vibration sensor.jpg)
+
+## Sensors Options
+
+- **ADXL335**: Analog 3-axis accelerometer (requires ADC pins).
+- **MPU6050**: Digital I2C 3-axis accelerometer and gyroscope (highly recommended).
+
+## Specifications (MPU6050)
 
 | Parameter | Value |
 |-----------|-------|
-| Model | <!-- TODO: Add --> |
-| Interface | <!-- TODO: Add --> |
-| Measurement Range | <!-- TODO: Add --> |
-| Sensitivity | <!-- TODO: Add --> |
-| Operating Voltage | <!-- TODO: Add --> |
-| I2C Address | <!-- TODO: Add --> |
+| Model | MPU6050 |
+| Interface | I2C |
+| Voltage | 3V - 5V |
+| Range | ±2g, ±4g, ±8g, ±16g |
+
 
 ## Pinout
 

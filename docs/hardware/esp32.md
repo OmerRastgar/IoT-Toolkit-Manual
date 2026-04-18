@@ -1,5 +1,8 @@
 # ESP32 Setup
 
+![ESP32 WROOM](../../assets/images/toolkit/WROOM-ESP32.webp)
+
+
 The ESP32 is the heart of the IoT Toolkit - a powerful WiFi-enabled microcontroller that connects all sensors to the cloud.
 
 ## Overview

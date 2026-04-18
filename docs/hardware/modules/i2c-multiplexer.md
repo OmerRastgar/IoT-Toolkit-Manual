@@ -6,6 +6,9 @@
 
 The TCA9548A I2C multiplexer allows multiple I2C devices with the same address to coexist on the same bus by creating 8 separate I2C channels.
 
+![I2C Multiplexer](../../assets/images/toolkit/I2C Multiplexer.webp)
+
+
 ## Specifications
 
 | Parameter | Value |

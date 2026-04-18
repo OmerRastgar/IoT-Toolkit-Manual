@@ -2,6 +2,9 @@
 
 Complete wiring reference for the IoT Toolkit.
 
+![Master Wiring Diagram](../../assets/images/toolkit/wiring diagram.png)
+
+
 ## ESP32 Pinout Reference
 
 ### DevKit V1 (30-pin) Layout

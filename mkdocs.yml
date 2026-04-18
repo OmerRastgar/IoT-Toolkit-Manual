@@ -47,7 +47,8 @@ theme:
     text: Roboto
     code: Roboto Mono
   favicon: assets/images/favicon.png
-  logo: assets/images/logo.png
+  logo: assets/images/toolkit/habib-university-logo.png
+
 
 extra:
   social:
@@ -133,7 +134,7 @@ nav:
       - hardware/sensors/temperature.md
       - hardware/sensors/humidity.md
       - hardware/sensors/vibration.md
-      - hardware/sensors/acoustic.md
+
     - Displays:
       - hardware/displays/index.md
       - hardware/displays/lcd.md
@@ -156,9 +157,10 @@ nav:
     - software/code-examples.md
   - Integration:
     - integration/index.md
+    - integration/node-red.md
     - integration/complete-code.md
     - integration/testing.md
-  - Cloud & Deployment:
+  - Cloud & Infrastructure:
     - cloud/index.md
     - cloud/aws.md
     - cloud/self-hosted.md

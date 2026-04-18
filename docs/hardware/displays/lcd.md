@@ -1,4 +1,7 @@
-# LCD Display
+# LCD (LiquidCrystal I2C)
+
+![LCD Display](../../assets/images/toolkit/lcd.webp)
+
 
 <!-- TODO: Extract all content from Copy of IoT Kit - Tehqiq.md -->
 
