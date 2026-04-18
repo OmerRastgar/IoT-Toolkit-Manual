@@ -4,7 +4,8 @@ This project was developed at Habib University to provide students with a compre
 
 ## Project Supervisor
 **Dr. Tariq Mumtaz**  
-Associate Professor / Assistant Dean, Dhanani School of Science and Engineering
+Assistant Professor, 
+Electrical and Computer Engineering
 
 ---
 
@@ -18,7 +19,7 @@ The following students from Habib University developed the core hardware integra
 
 ## Technical Consultant
 **Omer Rastgar**  
-Technical strategy, cloud infrastructure, and documentation refinement.
+Technical Consultant
 
 ---
 

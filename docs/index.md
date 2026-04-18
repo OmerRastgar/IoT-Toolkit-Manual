@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-<div align="center">
-  <img src="assets/images/toolkit/habib-university-logo.png" width="500">
-</div>
 
-
-=======
->>>>>>> f576fbd100d032a33b1d923854d93ba73d590dce
 # IoT Toolkit Manual
 
 ## What You'll Learn
